@@ -3,68 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
+    <meta name="description" content="MSVProperties Microservices v1.0" />
     <meta name="author" content="Nobel Dahal" />
-    <title><%= (!!locals.title) ? 'MSVProperties Microservice v1.0 | ' + title:'MSVProperties Microservice v1.0' %></title>
-
-    <link
-      rel="canonical"
-      href="https://getbootstrap.com/docs/5.0/examples/offcanvas-navbar/"
-    />
+    <title>
+      <%= (!!locals.title) ? 'MSVProperties Microservice v1.0 | ' +
+      title:'MSVProperties Microservice v1.0' %>
+    </title>
 
     <!-- Bootstrap core CSS -->
-    <link
-      href="/stylesheets/style.css"
-      rel="stylesheet"
-      crossorigin="anonymous"
-    />
+    <link href="/stylesheets/style.css" rel="stylesheet" />
 
     <!-- Favicons -->
     <meta name="theme-color" content="#7952b3" />
 
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-
-      main.container {
-        margin-bottom: 4rem;
-      }
- 
-      .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        text-align: center;
-      }
-    </style>
-
     <!-- Custom styles for this template -->
-    <link href="offcanvas.css" rel="stylesheet" />
+    <link href="stylesheets/main.css" rel="stylesheet" />
   </head>
   <body class="bg-secondary">
+    <!-- Loading -->
+    <div id="loading" class="d-flex justify-content-center align-items-center">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
     <!-- Main Nav -->
     <%- include('components/header.ejs') %>
-    
+
     <!-- Body Template -->
     <%- content %>
 
     <!-- Footer -->
     <%- include('components/footer.ejs') %>
-
-    <!-- Script -->
-    <script src="/javascripts/script.js" crossorigin="anonymous"></script>
-    <script src="offcanvas.js"></script>
   </body>
+  <!-- Script -->
+  <script src="/javascripts/jquery.js"></script>
+  <script src="/javascripts/script.js"></script>
+  <script src="/javascripts/main.js" defer></script>
 </html>
