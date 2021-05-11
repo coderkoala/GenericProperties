@@ -1,7 +1,7 @@
 (function ($) {
   "use strict";
   var frontEndController = {
-    queryGeolocationEndpoint : '/geolocation',
+    queryGeolocationEndpoint: "/geolocation",
     init: function () {
       frontEndController.hideLoading();
       $("input").on("input change keyup", function (e) {
@@ -25,13 +25,13 @@
         type: "POST",
         contentType: "application/json; charset=utf-8",
         datatype: "json",
-        data: JSON.stringify({ "location": $('#location').val() }),
+        data: JSON.stringify({ location: $("#location").val() }),
         url: frontEndController.queryGeolocationEndpoint,
-        success : function( res ) {
+        success: function (res) {
           console.log(res);
         },
-        error : function(xhr) {
-          console.log('error', xhr);
+        error: function (xhr) {
+          console.log("error", xhr);
         },
       });
     },
@@ -47,13 +47,27 @@
           break;
       }
     },
+    UUIDMatcher: function (str) {
+      return str.match(
+        /&id=\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
+      );
+    },
     sanitize: function (ele) {
       var $this = $(ele);
       var newValue = $this.val();
-      newValue = newValue.replace(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i, '');
-      newValue = newValue.replace(/\s{2,}/g, ' ');
+      newValue = newValue.replace(
+        /(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i,
+        ""
+      );
+      newValue = newValue.replace(/\s{2,}/g, " ");
       newValue = newValue.trim();
-      $this.val(newValue).change();
+
+      if (frontEndController.UUIDMatcher(newValue)) {
+        newValue = frontEndController.UUIDMatcher(newValue)[0].slice(4);
+        $this.val(newValue).change();
+      } else {
+        $this.val(newValue).change();
+      }
     },
   };
 

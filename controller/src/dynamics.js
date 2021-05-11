@@ -45,7 +45,7 @@ class DynamicsCrmRest {
   get(endPoint) {
     return this.auth(this.params).then(function (result) {
       const instance = axios.create({
-        baseURL: `https://${result.org}.api.crm.dynamics.com/api/data/v8.0/${endPoint}`,
+        baseURL: `https://${result.org}.api.crm.dynamics.com/api/data/v9.0/${endPoint}`,
         timeout: 0,
         headers: {
           "OData-MaxVersion": "4.0",
