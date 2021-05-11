@@ -54,7 +54,7 @@ class DynamicsCrmRest {
           Authorization: "Bearer " + result.token,
         },
       });
-      return instance.get();
+      return instance.get().catch( error => error );
     });
   }
 }

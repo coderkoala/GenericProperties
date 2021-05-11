@@ -1,6 +1,7 @@
 (function ($) {
   "use strict";
   var frontEndController = {
+    queryGeolocationEndpoint : '/geolocation',
     init: function () {
       frontEndController.hideLoading();
       $("input").on("input change keyup", function (e) {
@@ -9,6 +10,9 @@
       $("input").on("blur", function (e) {
         frontEndController.sanitize(this);
       });
+      $("#btnSubmit").on("click", function (e) {
+        frontEndController.getAjaxRequestLead();
+      });
     },
     showLoading: function () {
       $("#loading").removeClass("hidden");
@@ -16,7 +20,21 @@
     hideLoading: function () {
       $("#loading").addClass("hidden");
     },
-    getAjaxRequestLead: function () {},
+    getAjaxRequestLead: function () {
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        datatype: "json",
+        data: JSON.stringify({ "location": $('#location').val() }),
+        url: frontEndController.queryGeolocationEndpoint,
+        success : function( res ) {
+          console.log(res);
+        },
+        error : function(xhr) {
+          console.log('error', xhr);
+        },
+      });
+    },
     validate: function (ele) {
       var $this = $(ele);
       $this.removeClass("is-invalid");

@@ -2,6 +2,8 @@
 // const sequelize = require('sequelize');
 const { QueryTypes } = require('sequelize');
 const db = require("../models");
+let DynamicsCrmRest = require('./src/dynamics');
+
 
 class homeController {
 
@@ -10,11 +12,17 @@ class homeController {
     res.render('geolocation', { title: 'Geolocation' });
   }
 
-  post( req, res, next ) {
-    console.log('post!');
-    res.render('geolocation', { title: 'Geolocation' });
+  async post( req, res, next ) {
+    let leadid = req.body.location || '?$top=1';
+    let crm = new DynamicsCrmRest();
+    await crm.get(`leads${leadid}`).then( result => {
+      if ( undefined !== result.data &&  undefined !== result.data.value ) {
+        res.json( result.data.value );
+      } else {
+        res.json( [] );
+      }
+    });
   }
 }
-
 
 module.exports = new homeController();
