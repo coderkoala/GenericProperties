@@ -23,22 +23,19 @@
       var $type = $this.attr("validation");
       switch ($type) {
         case "location":
-          if ($this.val().match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\=|\+)+)/i)) {
-            var newValue = $this.val().trim();
+          if ($this.val().match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)) {
             $this.addClass("is-invalid");
-            newValue.trim().replace(/\s{2,}/g, " ");
-            $this.val(newValue).trigger("change");
           }
           break;
       }
     },
     sanitize: function (ele) {
       var $this = $(ele);
-      var newValue = $this.val().trim();
+      var newValue = $this.val();
       newValue.trim();
       newValue.replace(/\s{2,}/g, " ");
-      newValue.replace(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\=|\+)+)/i, "");
-      $this.val(newValue).trigger("change");
+      newValue.replace(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i, "");
+      $this.prop( 'value', newValue ).trigger('change');
     },
   };
 
