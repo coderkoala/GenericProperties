@@ -32,10 +32,10 @@
     sanitize: function (ele) {
       var $this = $(ele);
       var newValue = $this.val();
-      newValue.trim();
-      newValue.replace(/\s{2,}/g, " ");
-      newValue.replace(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i, "");
-      $this.prop( 'value', newValue ).trigger('change');
+      newValue = newValue.replace(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i, '');
+      newValue = newValue.replace(/\s{2,}/g, ' ');
+      newValue = newValue.trim();
+      $this.val(newValue).change();
     },
   };
 
