@@ -14,8 +14,8 @@ class homeController {
   }
 
   async post(req, res, next) {
-    let leadid =
-      undefined !== req.body.location ? `(${req.body.location})` : "!invalid";
+    let leadid = undefined === req.body.location || req.body.location.match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i) ? "!invalid" : `(${req.body.location})`;
+    
     let crm = new DynamicsCrmRest();
     await crm.get(`leads${leadid}?$select=new_latitude,new_longitude,subject,new_fullname`).then((result) => {
       if (undefined !== result.data) {

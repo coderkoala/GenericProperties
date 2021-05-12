@@ -5,15 +5,48 @@
     <h6 class="border-bottom pb-2 mb-2"><b><%= title %></b></h6>
     <div class="d-flex text-muted pt-3">
       <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-        <small class="text-muted mb-5">&nbsp;Lead UUID / Location Coordinates / Street Address :</small><br>
+        <small class="text-muted mb-5"
+          >&nbsp;Lead UUID / Location Coordinates / Street Address :</small
+        ><br />
         <div class="d-flex justify-content-between">
           <div class="input-group mb-3">
-            <input validation="location" id="location" type="text" class="form-control" placeholder="Lead UUID/Location Coordinates/Street Address" aria-label="Lead UUID/Location Coordinates/Street Address" aria-describedby="basic-addon2">
-            <button id="btnSubmit" class="input-group-text btn-outline-success">Find Nearby Agents</button>
+            <input
+              validation="location"
+              id="location"
+              type="text"
+              class="form-control"
+              placeholder="Lead UUID/Location Coordinates/Street Address"
+              aria-label="Lead UUID/Location Coordinates/Street Address"
+              aria-describedby="basic-addon2"
+            />
+            <button id="btnSubmit" class="input-group-text btn-outline-success">
+              Find Nearby Agents
+            </button>
           </div>
-          <br>
+          <br />
         </div>
         <div id="map" class="d-flex justify-content-between mt-3"></div>
+      </div>
+    </div>
+  </div>
+  <div id="tableau" class="my-3 p-3 bg-body rounded shadow-sm hidden">
+    <h6 class="border-bottom pb-2 mb-2"><b>Fetched Lead from Dynamics CRM</b></h6>
+    <div class="d-flex text-muted pt-3">
+      <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+        <div class="d-flex justify-content-between mt-3">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Lead Topic</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableContent"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
