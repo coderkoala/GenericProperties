@@ -16,7 +16,7 @@ class homeController {
     let leadid =
       undefined !== req.body.location ? `(${req.body.location})` : "!invalid";
     let crm = new DynamicsCrmRest();
-    await crm.get(`leads${leadid}`).then((result) => {
+    await crm.get(`leads${leadid}?$select=new_latitude,new_longitude,subject,new_fullname`).then((result) => {
       if (undefined !== result.data) {
         res.json(result.data);
       } else {
