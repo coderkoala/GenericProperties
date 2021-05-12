@@ -3,6 +3,7 @@
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
 let DynamicsCrmRest = require("./src/dynamics");
+const dotenv = require('dotenv');
 
 class homeController {
   async view(req, res, next) {
@@ -18,6 +19,7 @@ class homeController {
     let crm = new DynamicsCrmRest();
     await crm.get(`leads${leadid}?$select=new_latitude,new_longitude,subject,new_fullname`).then((result) => {
       if (undefined !== result.data) {
+        result.data.hotLink = process.env.dynamics_crm_record_link.replace('{entity}', 'lead') + result.data.leadid;
         res.json(result.data);
       } else {
         res
