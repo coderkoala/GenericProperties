@@ -20,6 +20,13 @@
     hideLoading: function () {
       $("#loading").addClass("hidden");
     },
+    messageBox: function(title, message, type='success'){
+      Swal.fire({
+        title: title,
+        icon:  type,
+        html:  message,
+      });
+    },
     getAjaxRequestLead: function () {
       $.ajax({
         type: "POST",
@@ -31,7 +38,7 @@
           console.log(res);
         },
         error: function (xhr) {
-          console.log("error", xhr);
+          frontEndController.messageBox('Failed Retrieving Leads', xhr.responseJSON.error, 'error');
         },
       });
     },
