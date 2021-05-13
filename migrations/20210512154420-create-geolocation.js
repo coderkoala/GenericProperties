@@ -1,27 +1,26 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Geolocations", {
+    await queryInterface.createTable("Geolocation", {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
-        unique: "compositeIndex",
+        type: Sequelize.STRING(40),
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(80),
       },
       address: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(160),
       },
       latitude: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
       },
       longitude: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
       },
       coordinates: {
         type: Sequelize.GEOMETRY("POINT", 4326),

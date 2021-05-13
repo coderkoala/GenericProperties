@@ -8,7 +8,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Geolocation.init(
     {
-      id: DataTypes.UUID,
+      id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+      },
       name: DataTypes.STRING,
       address: DataTypes.STRING,
       latitude: DataTypes.STRING,
@@ -18,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Geolocation",
+      tableName: 'geolocation'
     }
   );
   return Geolocation;
