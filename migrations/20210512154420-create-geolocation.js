@@ -35,8 +35,9 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
     });
+    await queryInterface.addIndex('Geolocation', ['coordinates', 'address']);
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Geolocations");
+    await queryInterface.dropTable("Geolocation");
   },
 };

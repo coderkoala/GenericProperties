@@ -24,6 +24,7 @@ main.container {
   top:0px;
   left:0px;
   z-index:1000;
+  opacity: 75%;
 }
 
 .footer {
