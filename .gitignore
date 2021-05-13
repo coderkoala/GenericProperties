@@ -1,3 +1,6 @@
+# For reading csv dumps
+dump
+
 # Logs
 logs
 *.log

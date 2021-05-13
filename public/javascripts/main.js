@@ -45,7 +45,7 @@
           var tableInjectRow = frontEndController.tableTemplate;
           tableInjectRow = tableInjectRow.replace(
             "{subject}",
-            '<a href="' + results.hotLink + '">' + results.subject + "</a>"
+            '<a target="_blank" href="' + results.hotLink + '">' + results.subject + "</a>"
           );
           tableInjectRow = tableInjectRow.replace(
             "{new_latitude}",
