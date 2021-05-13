@@ -47,7 +47,7 @@ class homeController {
     let longitude = this.longitude;
     let query = `SELECT 
                 id, address, name, 
-                CONCAT(ST_X(coordinates), ',' ,ST_Y(coordinates)) AS latLong,
+                CONCAT(ST_Y(coordinates), ',' ,ST_X(coordinates)) AS latLong,
                 (6371 * ACOS(COS(RADIANS(${latitude})) * COS(RADIANS(ST_Y(coordinates))) 
                 * COS(RADIANS(ST_X(coordinates)) - RADIANS(${longitude})) + SIN(RADIANS(${latitude}))
                 * SIN(RADIANS(ST_Y(coordinates))))) AS distance
