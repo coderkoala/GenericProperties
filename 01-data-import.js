@@ -1,8 +1,10 @@
 "use strict";
+require('dotenv').config();
 const db = require("./models").Geolocation;
 var fs = require("fs");
 var csv = require("csv-parser");
 const winston = require("winston");
+
 let mappedData = [];
 
 // Log info so we know what rows failed imports.
@@ -53,5 +55,5 @@ try {
         });
     });
 } catch (e) {
-  console.log(e);
+  //
 }

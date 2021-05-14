@@ -6,11 +6,6 @@ require("dotenv").config();
 
 class homeController {
   async view(req, res, next) {
-    let newlat = req.body.latLong;
-
-    // const users = await db.sequelize.query("SELECT * FROM `users`", {
-    //   type: QueryTypes.SELECT,
-    // }); Just test code.
     res.render("geolocation", { title: "Geolocation" });
   }
 

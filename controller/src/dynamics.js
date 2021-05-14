@@ -1,11 +1,11 @@
 "use strict";
+require('dotenv').config();
 const axios = require("axios");
-const dotenv = require('dotenv');
 const AuthenticationContext = require("adal-node").AuthenticationContext;
 
 class DynamicsCrmRest {
   constructor() {
-    dotenv.config();
+    
     this.params = {
       orgName: process.env.dynamics_orgName,
       orgDomain: process.env.dynamics_orgDomain,

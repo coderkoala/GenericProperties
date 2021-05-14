@@ -1,4 +1,5 @@
 "use strict";
+require('dotenv').config();
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
 let DynamicsCrmRest = require("./src/dynamics");
@@ -12,7 +13,6 @@ class homeController {
   }
 
   async post(req, res) {
-    require("dotenv").config();
     let hotLink = process.env.dynamics_crm_record_link.replace("{entity}", "cr4f2_agentsandrealtor");
 
     let coordinates = {};
