@@ -7,6 +7,9 @@ const router = express.Router();
 const requireDir = require('require-dir');
 const _ = requireDir('../controller');
 
+// Homepage Controller.
+router.get('/', _.frontend.view);
+
 // Geolocation Controller.
 router.get('/geolocation', _.geolocation.view);
 router.post('/geolocation', _.geolocation.post);

@@ -1,5 +1,4 @@
 'use strict';
-// const sequelize = require('sequelize');
 const { QueryTypes } = require('sequelize');
 const db = require("../models");
 
