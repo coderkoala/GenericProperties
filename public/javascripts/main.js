@@ -2,6 +2,7 @@
   "use strict";
   var frontEndController = {
     queryGeolocationEndpoint: "/geolocation",
+    queryfetchAgentEndpoint: "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}",
     tableTemplate:
       '<tr><th scope="row">{subject}</th><td>{new_fullname}</td><td>{new_latitude}</td><td>{new_longitude}</td><td><a href="#" id="renderMap">Show Nearby Agents</a></td></tr>',
     init: function () {

@@ -43,6 +43,7 @@ class homeController {
   }
 
   async fetchAgents(req, res, next) {
+    res.json(req.body);
     let latitude = this.latitude;
     let longitude = this.longitude;
     let query = `SELECT 

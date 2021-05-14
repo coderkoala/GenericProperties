@@ -8,7 +8,7 @@ const logger = require('morgan');
 
 // Import route files.
 const homeRouter = require('./routes/frontend');
-// const adminRouter = require('./routes/backend');
+const adminRouter = require('./routes/backend');
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Basic Router Configuration.
 app.use('/', homeRouter);
-// app.use('/admin', adminRouter);
+app.use('/api', adminRouter);
 
 // Setting up Sequelize ORM
 const db = require("./models");
