@@ -79,7 +79,7 @@ class homeController {
 
     res.json({
       data: agentsParsed,
-      template: `<table><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`
+      template: `<table class="table table-hover"><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`
     });
   }
 }
