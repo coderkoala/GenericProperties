@@ -137,12 +137,13 @@
           success: function (results) {
             frontEndController.agentResults = results;
             frontEndController.hideLoading();
-            if (frontEndController.agentResults.results.length) {
+            var size = Object.keys(frontEndController.agentResults.data).length;
+            if (size) {
               frontEndController.messageBox(
                 "Agents Found",
-                "Found " +
-                  frontEndController.agentResults.results.length +
-                  " nearby agents. Map will be updated shortly.",
+                "Was able to compute " +
+                size +
+                  " nearby points. Map will be updated shortly.",
                 "success"
               );
               frontEndController.renderAgentResults();
@@ -166,15 +167,16 @@
       }
     },
     renderAgentResults: function () {
-      var data = frontEndController.agentResults;
+      var fetchedAgents = frontEndController.agentResults;
 
-      data.results.forEach(function (singleAgentTuple, k) {
+      Object.keys(fetchedAgents.data).forEach(function (coordinateLatLong) {
+        let singleAgentTuple = fetchedAgents.data[coordinateLatLong];
+        let splitCoordinates = coordinateLatLong.split(',');
 
         // Initiate Marker
-        console.log(singleAgentTuple);
         var leadCenterLatLong = L.latLng(
-          singleAgentTuple.latitude,
-          singleAgentTuple.longitude
+          splitCoordinates[0], // Latitude.
+          splitCoordinates[1], // Longitude.
         );
 
         // Override icon from class instantiation.
@@ -184,7 +186,7 @@
           ),
         })
           .addTo(frontEndController.map)
-          .bindPopup(singleAgentTuple.name, {
+          .bindPopup(fetchedAgents.template.replace('{0}', singleAgentTuple ), {
             closeOnClick: false,
             autoClose: false,
           });

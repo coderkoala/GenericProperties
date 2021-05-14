@@ -14,7 +14,7 @@ class homeController {
 
   async post(req, res) {
     require("dotenv").config();
-    let hotLink = process.env.dynamics_crm_record_link.replace("{entity}", "cr4f2_agentsandrealtors");
+    let hotLink = process.env.dynamics_crm_record_link.replace("{entity}", "cr4f2_agentsandrealtor");
 
     let coordinates = {};
     coordinates.latitude = Number(req.query.latitude) || false;
@@ -60,7 +60,7 @@ class homeController {
     });
 
     let agentsParsed = {};
-    let rowTemplate = `<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>`;
+    let rowTemplate = `<tr><td>{0}</td><td>{1}</td></tr>`;
 
     resultsAgents.forEach( singleTupleAgent => {
       let index = (singleTupleAgent.latitude + ',' + singleTupleAgent.longitude);
@@ -72,18 +72,14 @@ class homeController {
 
       let rowToBeConcatenated = rowTemplate
       .replace('{0}', `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`)
-      .replace('{1}', `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`)
-      .replace('{2}', `${singleTupleAgent.distance}`);
+      .replace('{1}', `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`);
 
       agentsParsed[index] += rowToBeConcatenated;
     });
 
     res.json({
-      coordinates: coordinates,
-      results: resultsAgents,
       data: agentsParsed,
-      hotLink: hotLink,
-      template: `<table><tr><th>Agent Name</th><th>Directions(Google)</th><th>Distance(KM)</th></tr></table>`
+      template: `<table><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`
     });
   }
 }
