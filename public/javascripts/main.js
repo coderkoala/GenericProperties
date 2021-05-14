@@ -63,15 +63,15 @@
     renderMap: function () {
       var element = document.getElementById("map");
       element.style = "height:600px;";
-      var map = L.map(element);
+      frontEndController.map = L.map(element);
 
-      map.attributionControl.setPrefix(
+      frontEndController.map.attributionControl.setPrefix(
         '&copy; 2021 <a href="http://nobeldahal.com.np" target="_blank">Nobel Dahal</a>'
       );
       L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+      }).addTo(frontEndController.map);
 
       // Target's GPS coordinates.
       var target = L.latLng(
@@ -82,19 +82,23 @@
         frontEndController.results.new_latitude,
         frontEndController.results.new_longitude
       );
-      map.setView(target, 14);
+      frontEndController.map.setView(target, 14);
 
       // Add marker.
       L.marker(leadCenterLatLong, {
         icon: frontEndController.getIconInstance(),
       })
-        .addTo(map)
+        .addTo(frontEndController.map)
         .bindPopup(frontEndController.results.new_fullname, {
           closeOnClick: false,
           autoClose: false,
         });
+
+      // Don't let another iteration proceed.
+      $("#btnSubmit").remove();
+      $("#location").attr("disabled", "disabled").addClass("disabled");
     },
-    getIconInstance: function (icon = '/stylesheets/images/home.png') {
+    getIconInstance: function (icon = "/stylesheets/images/home.png") {
       var customIcon = L.Icon.extend({
         options: {
           iconSize: [25, 25],
@@ -103,7 +107,88 @@
 
       return new customIcon({
         iconUrl: icon,
-    })
+      });
+    },
+    fetchAgentCoordinatesPOST: function () {
+      var endpoint = frontEndController.queryfetchAgentEndpoint;
+      if (
+        false === frontEndController.results.new_longitude ||
+        false === frontEndController.results.new_latitude ||
+        isNaN(frontEndController.results.new_latitude) ||
+        isNaN(frontEndController.results.new_longitude) ||
+        !isFinite(frontEndController.results.new_latitude) ||
+        Math.abs(frontEndController.results.new_latitude) > 90 ||
+        !isFinite(frontEndController.results.new_longitude) ||
+        Math.abs(frontEndController.results.new_longitude) > 180
+      ) {
+        // Render div for error handling
+        console.log("Handle exception for validation issue with no latLong!");
+      } else {
+        endpoint = endpoint
+          .replace("{latitude}", frontEndController.results.new_latitude)
+          .replace("{longitude}", frontEndController.results.new_longitude)
+          .replace("{distance}", 5);
+        frontEndController.showLoading();
+        $.ajax({
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          datatype: "json",
+          url: endpoint,
+          success: function (results) {
+            frontEndController.agentResults = results;
+            frontEndController.hideLoading();
+            if (frontEndController.agentResults.results.length) {
+              frontEndController.messageBox(
+                "Agents Found",
+                "Found " +
+                  frontEndController.agentResults.results.length +
+                  " nearby agents. Map will be updated shortly.",
+                "success"
+              );
+              frontEndController.renderAgentResults();
+            } else {
+              frontEndController.messageBox(
+                "No nearby Agents found",
+                "The system was unable to find any nearby agents in the vicinity(5 KM) of the lead. Please broaden your choice and try again.",
+                "error"
+              );
+            }
+          },
+          error: function (xhr) {
+            frontEndController.hideLoading();
+            frontEndController.messageBox(
+              "Failed Computing Agents",
+              "A network issue prevented from computing Agents locations around the lead. Please try again later.",
+              "error"
+            );
+          },
+        });
+      }
+    },
+    renderAgentResults: function () {
+      var data = frontEndController.agentResults;
+
+      data.results.forEach(function (singleAgentTuple, k) {
+
+        // Initiate Marker
+        console.log(singleAgentTuple);
+        var leadCenterLatLong = L.latLng(
+          singleAgentTuple.latitude,
+          singleAgentTuple.longitude
+        );
+
+        // Override icon from class instantiation.
+        L.marker(leadCenterLatLong, {
+          icon: frontEndController.getIconInstance(
+            "/stylesheets/images/user.png"
+          ),
+        })
+          .addTo(frontEndController.map)
+          .bindPopup(singleAgentTuple.name, {
+            closeOnClick: false,
+            autoClose: false,
+          });
+      });
     },
     getAjaxRequestLead: function () {
       frontEndController.showLoading();
@@ -127,9 +212,11 @@
             Math.abs(results.new_longitude) > 180
           ) {
             // Render div for error handling
+            console.log("Handle exception map being unrenderable!");
           } else {
             frontEndController.renderTableResults();
             frontEndController.renderMap();
+            frontEndController.fetchAgentCoordinatesPOST();
           }
         },
         error: function (xhr) {

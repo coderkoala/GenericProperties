@@ -3,7 +3,7 @@
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
 let DynamicsCrmRest = require("./src/dynamics");
-const dotenv = require("dotenv");
+require("dotenv").config();
 
 class homeController {
   async view(req, res, next) {
@@ -40,36 +40,6 @@ class homeController {
           });
         }
       });
-  }
-
-  async fetchAgents(req, res, next) {
-    res.json(req.body);
-    let latitude = this.latitude;
-    let longitude = this.longitude;
-    let query = `SELECT 
-                id, address, name, 
-                CONCAT(ST_Y(coordinates), ',' ,ST_X(coordinates)) AS latLong,
-                (6371 * ACOS(COS(RADIANS(${latitude})) * COS(RADIANS(ST_Y(coordinates))) 
-                * COS(RADIANS(ST_X(coordinates)) - RADIANS(${longitude})) + SIN(RADIANS(${latitude}))
-                * SIN(RADIANS(ST_Y(coordinates))))) AS distance
-                FROM geolocation
-                WHERE MBRContains
-                    (
-                    LineString
-                        (
-                        Point (
-                            ${longitude} + 30 / (111.320 * COS(RADIANS(${latitude}))),
-                            ${latitude} + 30 / 111.133
-                        ),
-                        Point (
-                            ${longitude} - 30 / (111.320 * COS(RADIANS(${latitude}))),
-                            ${latitude} - 30 / 111.133
-                        )
-                    ),
-                    coordinates
-                    )
-                HAVING distance < 5
-                ORDER By distance`;
   }
 }
 

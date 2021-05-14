@@ -2,7 +2,6 @@
 // const sequelize = require('sequelize');
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
-const dd = require("dump-die");
 let DynamicsCrmRest = require("./src/dynamics");
 
 class homeController {
@@ -18,6 +17,9 @@ class homeController {
   }
 
   async post(req, res) {
+    require("dotenv").config();
+    let hotLink = process.env.dynamics_crm_record_link.replace("{entity}", "cr4f2_agentsandrealtors");
+
     let coordinates = {};
     coordinates.latitude = Number(req.query.latitude) || false;
     coordinates.longitude = Number(req.query.longitude) || false;
@@ -32,8 +34,9 @@ class homeController {
 
     let sqlQuery = `
     SELECT 
-    id, address, name, 
-    CONCAT(ST_Y(coordinates), ',' ,ST_X(coordinates)) AS latLong,
+    name, address, id,
+    ST_Y(coordinates) AS latitude,
+    ST_X(coordinates) AS longitude,
     (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
     * COS(RADIANS(ST_X(coordinates)) - RADIANS(${coordinates.longitude})) + SIN(RADIANS(${coordinates.latitude}))
     * SIN(RADIANS(ST_Y(coordinates))))) AS distance
@@ -63,6 +66,7 @@ class homeController {
     res.json({
       coordinates: coordinates,
       results: resultsAgents,
+      hotLink: hotLink
     });
   }
 }
