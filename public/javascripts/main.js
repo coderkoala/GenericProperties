@@ -74,14 +74,36 @@
       }).addTo(map);
 
       // Target's GPS coordinates.
-      var target = L.latLng(results.new_latitude, results.new_longitude);
-      // var abc = L.latLng("47.51737", "19.14611");
+      var target = L.latLng(
+        frontEndController.results.new_latitude,
+        frontEndController.results.new_longitude
+      );
+      var leadCenterLatLong = L.latLng(
+        frontEndController.results.new_latitude,
+        frontEndController.results.new_longitude
+      );
       map.setView(target, 14);
 
       // Add marker.
-      // L.marker(abc)
-      //   .addTo(map)
-      //   .bindPopup('Test', { closeOnClick: false, autoClose: false });
+      L.marker(leadCenterLatLong, {
+        icon: frontEndController.getIconInstance(),
+      })
+        .addTo(map)
+        .bindPopup(frontEndController.results.new_fullname, {
+          closeOnClick: false,
+          autoClose: false,
+        });
+    },
+    getIconInstance: function (icon = '/stylesheets/images/home.png') {
+      var customIcon = L.Icon.extend({
+        options: {
+          iconSize: [25, 25],
+        },
+      });
+
+      return new customIcon({
+        iconUrl: icon,
+    })
     },
     getAjaxRequestLead: function () {
       frontEndController.showLoading();
