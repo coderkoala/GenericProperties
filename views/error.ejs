@@ -2,11 +2,11 @@
 
 <main class="container">
   <div class="my-3 p-3 mt-5 bg-body rounded shadow-sm">
-    <h3 class="border-bottom pb-2 mb-2"><b><%= error.status %> - <%= message %></b></h3>
+    <h3 class="border-bottom pb-2 mb-2"><b><%= message %> <%= error.status || 404 %></b></h3>
     <div class="d-flex text-muted pt-3">
       <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
         <div class="d-flex justify-content-between mt-3">
-          <pre><%= error.stack %></pre>
+          <pre><%= error.stack || 'The resource you were trying to reach does not exist.' %></pre>
         </div>
       </div>
     </div>

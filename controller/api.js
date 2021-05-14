@@ -6,12 +6,8 @@ let DynamicsCrmRest = require("./src/dynamics");
 
 class homeController {
   async view(req, res, next) {
-    const users = await db.sequelize.query("SELECT * FROM `users`", {
-      type: QueryTypes.SELECT,
-    });
     let crm = new DynamicsCrmRest();
     await crm.get("leads?$top=3").then((result) => {
-      dd(result);
       res.render("index", { title: "View!" });
     });
   }
@@ -34,7 +30,7 @@ class homeController {
 
     let sqlQuery = `
     SELECT 
-    name, address, id,
+    name, address, CONCAT('${hotLink}',geolocation.id) as url,
     ST_Y(coordinates) AS latitude,
     ST_X(coordinates) AS longitude,
     (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
@@ -63,9 +59,29 @@ class homeController {
       type: QueryTypes.SELECT,
     });
 
+    let agentsParsed = {};
+    let rowTemplate = `<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>`;
+
+    resultsAgents.forEach( singleTupleAgent => {
+      let index = (singleTupleAgent.latitude + ',' + singleTupleAgent.longitude);
+      
+      // Initialize string if it hasn't been done yet.
+      if('string' !== typeof agentsParsed[index]){
+        agentsParsed[index] = '';
+      }
+
+      let rowToBeConcatenated = rowTemplate
+      .replace('{0}', `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`)
+      .replace('{1}', `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`)
+      .replace('{2}', `${singleTupleAgent.distance}`);
+
+      agentsParsed[index] += rowToBeConcatenated;
+    });
+
     res.json({
       coordinates: coordinates,
       results: resultsAgents,
+      data: agentsParsed,
       hotLink: hotLink
     });
   }
