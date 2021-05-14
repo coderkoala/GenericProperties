@@ -82,7 +82,8 @@ class homeController {
       coordinates: coordinates,
       results: resultsAgents,
       data: agentsParsed,
-      hotLink: hotLink
+      hotLink: hotLink,
+      template: `<table><tr><th>Agent Name</th><th>Directions(Google)</th><th>Distance(KM)</th></tr></table>`
     });
   }
 }
