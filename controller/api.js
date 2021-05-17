@@ -1,5 +1,5 @@
 "use strict";
-require('dotenv').config();
+require("dotenv").config();
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
 let DynamicsCrmRest = require("./src/dynamics");
@@ -13,14 +13,26 @@ class homeController {
   }
 
   async post(req, res) {
-    let hotLink = process.env.dynamics_crm_record_link.replace("{entity}", "cr4f2_agentsandrealtor");
+    let hotLink = process.env.dynamics_crm_record_link.replace(
+      "{entity}",
+      "cr4f2_agentsandrealtor"
+    );
 
     let coordinates = {};
     coordinates.latitude = Number(req.query.latitude) || false;
     coordinates.longitude = Number(req.query.longitude) || false;
     coordinates.distance = req.query.distance || 5;
 
-    if ( false === coordinates.longitude || false === coordinates.latitude || isNaN(coordinates.latitude) || isNaN(coordinates.longitude) ||  ( ! isFinite(coordinates.latitude) || Math.abs(coordinates.latitude) > 90) || ( ! isFinite(coordinates.longitude) || Math.abs(coordinates.longitude) > 180) ) {
+    if (
+      false === coordinates.longitude ||
+      false === coordinates.latitude ||
+      isNaN(coordinates.latitude) ||
+      isNaN(coordinates.longitude) ||
+      !isFinite(coordinates.latitude) ||
+      Math.abs(coordinates.latitude) > 90 ||
+      !isFinite(coordinates.longitude) ||
+      Math.abs(coordinates.longitude) > 180
+    ) {
       res.status(400).send({
         error:
           "Invalid query parameter detected. Please pass valid latitude and longitude parameters.",
@@ -29,7 +41,7 @@ class homeController {
 
     let sqlQuery = `
     SELECT 
-    name, address, CONCAT('${hotLink}',geolocation.id) as url,
+    name, address, email, CONCAT('${hotLink}',geolocation.id) as url,
     ST_Y(coordinates) AS latitude,
     ST_X(coordinates) AS longitude,
     (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
@@ -61,24 +73,30 @@ class homeController {
     let agentsParsed = {};
     let rowTemplate = `<tr><td>{0}</td><td>{1}</td></tr>`;
 
-    resultsAgents.forEach( singleTupleAgent => {
-      let index = (singleTupleAgent.latitude + ',' + singleTupleAgent.longitude);
-      
+    resultsAgents.forEach((singleTupleAgent) => {
+      let index = singleTupleAgent.latitude + "," + singleTupleAgent.longitude;
+
       // Initialize string if it hasn't been done yet.
-      if('string' !== typeof agentsParsed[index]){
-        agentsParsed[index] = '';
+      if ("string" !== typeof agentsParsed[index]) {
+        agentsParsed[index] = "";
       }
 
       let rowToBeConcatenated = rowTemplate
-      .replace('{0}', `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`)
-      .replace('{1}', `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`);
+        .replace(
+          "{0}",
+          `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`
+        )
+        .replace(
+          "{1}",
+          `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`
+        );
 
       agentsParsed[index] += rowToBeConcatenated;
     });
 
     res.json({
       data: agentsParsed,
-      template: `<table class="table table-hover"><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`
+      template: `<table class="table table-hover"><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`,
     });
   }
 }

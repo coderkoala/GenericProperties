@@ -14,6 +14,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING(160),
       },
+      email: {
+        allowNull: true,
+        type: Sequelize.STRING(160),
+      },
       latitude: {
         allowNull: true,
         type: Sequelize.STRING(32),
@@ -35,7 +39,7 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
     });
-    await queryInterface.addIndex('Geolocation', ['coordinates', 'address']);
+    await queryInterface.addIndex("Geolocation", ["coordinates", "address"]);
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("Geolocation");

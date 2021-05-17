@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       address: DataTypes.STRING,
+      email: DataTypes.STRING,
       latitude: DataTypes.STRING,
       longitude: DataTypes.STRING,
       coordinates: DataTypes.GEOMETRY("POINT", 4326),
@@ -21,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Geolocation",
-      tableName: 'geolocation'
+      tableName: "geolocation",
     }
   );
   return Geolocation;
