@@ -35,7 +35,7 @@ class homeController {
     ) {
       res.status(400).send({
         error:
-          "Invalid query parameter detected. Please pass valid latitude and longitude parameters.",
+          "The Lead doesn't have valid location info. System will try to initiate forward geolocation encoding.",
       });
     }
 

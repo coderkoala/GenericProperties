@@ -6,7 +6,7 @@ require("dotenv").config();
 
 class homeController {
   async view(req, res, next) {
-    res.render("geolocation", { title: "Geolocation" });
+    res.render("geolocation", { title: "Geolocation", apiKey: process.env.geolocation_api_key || 'invalid' });
   }
 
   async post(req, res, next) {
@@ -19,7 +19,7 @@ class homeController {
     let crm = new DynamicsCrmRest();
     await crm
       .get(
-        `leads${leadid}?$select=new_latitude,new_longitude,subject,new_fullname`
+        `leads${leadid}?$select=new_latitude,new_longitude,subject,new_fullname,new_street`
       )
       .then((result) => {
         if (undefined !== result.data) {
@@ -30,7 +30,7 @@ class homeController {
         } else {
           res.status(404).send({
             error:
-              "No lead records found. Please try again with a valid record.",
+              "No lead records found. Please try again with a valid record UUID.",
           });
         }
       });

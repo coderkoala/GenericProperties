@@ -4,6 +4,7 @@
     queryGeolocationEndpoint: "/geolocation",
     queryfetchAgentEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}",
+    queryTranslationEndpoint: "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
     tableTemplate:
       '<tr><th scope="row">{subject}</th><td>{new_fullname}</td><td>{new_latitude}</td><td>{new_longitude}</td></tr>',
     init: function () {
@@ -93,7 +94,7 @@
       );
       frontEndController.map.setView(target, 14);
 
-      let subject =
+      var subject =
         '<a target="_blank" href="' +
         frontEndController.results.hotLink +
         '">' +
@@ -131,8 +132,8 @@
     fetchAgentCoordinatesPOST: function () {
       var endpoint = frontEndController.queryfetchAgentEndpoint;
       if (
-        false === frontEndController.results.new_longitude ||
-        false === frontEndController.results.new_latitude ||
+        null === frontEndController.results.new_longitude ||
+        null === frontEndController.results.new_latitude ||
         isNaN(frontEndController.results.new_latitude) ||
         isNaN(frontEndController.results.new_longitude) ||
         !isFinite(frontEndController.results.new_latitude) ||
@@ -142,6 +143,11 @@
       ) {
         // Render div for error handling
         console.log("Handle exception for validation issue with no latLong!");
+        frontEndController.messageBox(
+          "Agents Found",
+          "Exception occured during validation: Issue with no valid latitude and longitude coordinates.",
+          "error"
+        );
       } else {
         endpoint = endpoint
           .replace("{latitude}", frontEndController.results.new_latitude)
@@ -189,8 +195,8 @@
       var fetchedAgents = frontEndController.agentResults;
 
       Object.keys(fetchedAgents.data).forEach(function (coordinateLatLong) {
-        let singleAgentTuple = fetchedAgents.data[coordinateLatLong];
-        let splitCoordinates = coordinateLatLong.split(",");
+        var singleAgentTuple = fetchedAgents.data[coordinateLatLong];
+        var splitCoordinates = coordinateLatLong.split(",");
 
         // Initiate Marker
         var leadCenterLatLong = L.latLng(
@@ -211,6 +217,41 @@
             autoClose: false,
           });
       });
+    },
+    parseGeolocation: function(){
+      var singleTuple = frontEndController.geolocationData.data.pop();
+      frontEndController.results.new_latitude = singleTuple.latitude;
+      frontEndController.results.new_longitude = singleTuple.longitude;
+
+      // Initiate recovery.
+      frontEndController.renderTableResults();
+      frontEndController.renderMap();
+      frontEndController.fetchAgentCoordinatesPOST();
+    },
+    fetchGeolocation: function(){
+      var dataKeyAPI = $('main').data('key');
+      if ( null === frontEndController.results.new_street || ! frontEndController.results.new_street ) {
+        frontEndController.messageBox(
+          "Error",
+          "Geolocation services can not be accessed, the lead doesn't have a valid street address.",
+          "error"
+        );
+        frontEndController.hideLoading();
+      } else {
+        $.getJSON( frontEndController.queryTranslationEndpoint.replace('{access_key}', dataKeyAPI).replace('{query}', frontEndController.results.new_street), {} )
+          .done(function( json ) {
+            frontEndController.geolocationData = json;
+            frontEndController.parseGeolocation();
+          })
+          .fail(function() {
+            frontEndController.messageBox(
+              "Service Down",
+              "The geolocation service is currently down, please try again later.",
+              "error"
+            );
+            frontEndController.hideLoading();
+        });
+      }
     },
     getAjaxRequestLead: function () {
       frontEndController.showLoading();
@@ -234,6 +275,8 @@
         success: function (results) {
           frontEndController.results = results;
           if (
+            null === results.new_longitude ||
+            null === results.latitude ||
             false === results.new_longitude ||
             false === results.new_latitude ||
             isNaN(results.new_latitude) ||
@@ -243,8 +286,13 @@
             !isFinite(results.new_longitude) ||
             Math.abs(results.new_longitude) > 180
           ) {
-            // Render div for error handling
-            console.log("Handle exception map being unrenderable!");
+            frontEndController.messageBox(
+              "Invalid coordinates detected",
+              "The script detected invalid coordinates, will now attempt to geocode the data. ",
+              "warning"
+            );
+            frontEndController.fetchGeolocation();
+            // @todo, introduce recoverability mechanics here.
           } else {
             frontEndController.renderTableResults();
             frontEndController.renderMap();
