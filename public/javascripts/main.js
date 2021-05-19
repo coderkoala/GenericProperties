@@ -23,11 +23,8 @@
     },
     bootFieldLeadUUID: function () {
       try {
-        var leadAssociatedGUID = window.parent.Xrm.Page.data.entity
-          .getId()
-          .replace("{", "")
-          .replace("}", "");
-        $("#location").val(leadAssociatedGUID).change();
+        var leadLocation = window.location.search.replace('?id=','').split('&')[0];
+        $("#location").val(leadLocation).change();
       } catch (e) {}
     },
     showLoading: function () {
