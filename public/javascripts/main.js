@@ -21,9 +21,14 @@
       // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
       frontEndController.bootFieldLeadUUID();
     },
-    bootFieldLeadUUID : function() {
-      var leadAssociatedGUID = window.parent.Xrm.Page.data.entity.getId().replace('{', '').replace('}','');
-      $('#location').val(leadAssociatedGUID).change();
+    bootFieldLeadUUID: function () {
+      try {
+        var leadAssociatedGUID = window.parent.Xrm.Page.data.entity
+          .getId()
+          .replace("{", "")
+          .replace("}", "");
+        $("#location").val(leadAssociatedGUID).change();
+      } catch (e) {}
     },
     showLoading: function () {
       $("#loading").removeClass("hidden");
