@@ -17,6 +17,13 @@
       $("#btnSubmit").on("click", function (e) {
         frontEndController.getAjaxRequestLead();
       });
+
+      // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
+      frontEndController.bootFieldLeadUUID();
+    },
+    bootFieldLeadUUID : function() {
+      var leadAssociatedGUID = window.parent.Xrm.Page.data.entity.getId().replace('{', '').replace('}','');
+      $('#location').val(leadAssociatedGUID).change();
     },
     showLoading: function () {
       $("#loading").removeClass("hidden");
