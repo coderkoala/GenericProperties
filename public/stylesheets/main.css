@@ -68,3 +68,8 @@ main.container {
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+
+.leaflet-popup-close-button {
+  right: 0 !important;
+  left: 6px !important;
+}

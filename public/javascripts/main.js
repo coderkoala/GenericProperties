@@ -57,8 +57,8 @@
       );
       tableName.empty().append(tableInjectRow);
       frontEndController.hideLoading();
-      $("#tableau").removeClass("hidden");
-      $("#tableau").fadeIn("slow");
+      // $("#tableau").removeClass("hidden"); For development.
+      // $("#tableau").fadeIn("slow");
     },
     renderMap: function () {
       var element = document.getElementById("map");
@@ -84,12 +84,19 @@
       );
       frontEndController.map.setView(target, 14);
 
+      let subject =
+        '<a target="_blank" href="' +
+        frontEndController.results.hotLink +
+        '">' +
+        frontEndController.results.subject +
+        "</a>";
+
       // Add marker.
       L.marker(leadCenterLatLong, {
         icon: frontEndController.getIconInstance(),
       })
         .addTo(frontEndController.map)
-        .bindPopup(frontEndController.results.new_fullname, {
+        .bindPopup(subject, {
           closeOnClick: false,
           autoClose: false,
         });
@@ -98,10 +105,13 @@
       $("#btnSubmit").remove();
       $("#location").attr("disabled", "disabled").addClass("disabled");
     },
-    getIconInstance: function (icon = "/stylesheets/images/home.png") {
+    getIconInstance: function (
+      icon = "/stylesheets/images/home.png",
+      dimensions = [25, 25]
+    ) {
       var customIcon = L.Icon.extend({
         options: {
-          iconSize: [25, 25],
+          iconSize: dimensions,
         },
       });
 
@@ -142,7 +152,7 @@
               frontEndController.messageBox(
                 "Agents Found",
                 "Was able to compute " +
-                size +
+                  size +
                   " nearby points. Map will be updated shortly.",
                 "success"
               );
@@ -171,22 +181,23 @@
 
       Object.keys(fetchedAgents.data).forEach(function (coordinateLatLong) {
         let singleAgentTuple = fetchedAgents.data[coordinateLatLong];
-        let splitCoordinates = coordinateLatLong.split(',');
+        let splitCoordinates = coordinateLatLong.split(",");
 
         // Initiate Marker
         var leadCenterLatLong = L.latLng(
           splitCoordinates[0], // Latitude.
-          splitCoordinates[1], // Longitude.
+          splitCoordinates[1] // Longitude.
         );
 
         // Override icon from class instantiation.
         L.marker(leadCenterLatLong, {
           icon: frontEndController.getIconInstance(
-            "/stylesheets/images/user.png"
+            "/stylesheets/images/user.png",
+            [18, 25]
           ),
         })
           .addTo(frontEndController.map)
-          .bindPopup(fetchedAgents.template.replace('{0}', singleAgentTuple ), {
+          .bindPopup(fetchedAgents.template.replace("{0}", singleAgentTuple), {
             closeOnClick: false,
             autoClose: false,
           });
@@ -195,6 +206,16 @@
     getAjaxRequestLead: function () {
       frontEndController.showLoading();
       $("#tableau").fadeOut("slow");
+      $("input").change();
+      if ($(".is-invalid").length) {
+        frontEndController.messageBox(
+          "Error",
+          "Invalid Lead UUID detected, computation can not occur without valid Lead UUID.",
+          "error"
+        );
+        frontEndController.hideLoading();
+        return;
+      }
       $.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
