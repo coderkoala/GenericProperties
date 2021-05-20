@@ -368,6 +368,14 @@
 
   // Boot up and remove loading.
   $(document).ready(function () {
-    setTimeout(window.frontEndController.init, 500);
+    switch( document.location.pathname ) {
+      case '/geolocation':
+        setTimeout(window.frontEndController.init, 500);
+        break;
+      
+      default:
+        setTimeout(window.frontEndController.hideLoading, 500);
+        console.log('[Load finished] No scripts loaded');
+    }
   });
 })(jQuery.noConflict());
