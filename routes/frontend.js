@@ -15,8 +15,7 @@ router.get('/geolocation', _.geolocation.view);
 router.post('/geolocation', _.geolocation.post);
 
 // Zillow API Controller.
-router.get('/zillow', _.zillow.view);
-router.post('/zillow', _.zillow.post);
+router.post('/zillow', _.zillow.fetchXMLAPI);
 
 // Terms Controller.
 router.get('/terms', _.terms.view);
