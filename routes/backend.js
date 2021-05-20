@@ -12,4 +12,7 @@ const api = '/v1';
 router.get(`${api}/geolocation`, _.api.view);
 router.post(`${api}/geolocation`, _.api.post);
 
+// Zillow API Controller.
+router.post(`${api}/zillow`, _.zillow.fetchXMLAPI);
+
 module.exports = router;

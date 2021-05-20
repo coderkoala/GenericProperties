@@ -7,8 +7,8 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
+    "username": "msvproperties",
+    "password": "msvproperties",
     "database": "msvproperties",
     "host": "127.0.0.1",
     "dialect": "mysql"
