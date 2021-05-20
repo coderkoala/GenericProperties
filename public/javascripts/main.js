@@ -4,7 +4,8 @@
     queryGeolocationEndpoint: "/geolocation",
     queryfetchAgentEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}",
-    queryTranslationEndpoint: "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
+    queryTranslationEndpoint:
+      "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
     tableTemplate:
       '<tr><th scope="row">{subject}</th><td>{new_fullname}</td><td>{new_latitude}</td><td>{new_longitude}</td></tr>',
     init: function () {
@@ -23,16 +24,19 @@
       frontEndController.bootFieldLeadUUID();
     },
     bootFieldLeadUUID: function () {
-      var success = false;
+      var skipBlockInvisibility = true;
       try {
-        var leadLocation = window.location.search.replace('?id=','').split('&')[0];
+        var leadLocation = window.location.search
+          .replace("?id=", "")
+          .split("&")[0];
         $("#location").val(leadLocation).change();
-        success = true;
-      } catch (e) { return false;}
+      } catch (e) {
+        skipBlockInvisibility = true;
+      }
 
-      if (success) {
-        $('nav').hide(); // For reducing noise.
-        $('footer').hide(); // For reducing noise.
+      if (!skipBlockInvisibility) {
+        $("nav").hide(); // For reducing noise.
+        $("footer").hide(); // For reducing noise.
       }
     },
     showLoading: function () {
@@ -225,7 +229,7 @@
           });
       });
     },
-    parseGeolocation: function(){
+    parseGeolocation: function () {
       var singleTuple = frontEndController.geolocationData.data.pop();
       frontEndController.results.new_latitude = singleTuple.latitude;
       frontEndController.results.new_longitude = singleTuple.longitude;
@@ -235,9 +239,12 @@
       frontEndController.renderMap();
       frontEndController.fetchAgentCoordinatesPOST();
     },
-    fetchGeolocation: function(){
-      var dataKeyAPI = $('main').data('key');
-      if ( null === frontEndController.results.new_street || ! frontEndController.results.new_street ) {
+    fetchGeolocation: function () {
+      var dataKeyAPI = $("main").data("key");
+      if (
+        null === frontEndController.results.new_street ||
+        !frontEndController.results.new_street
+      ) {
         frontEndController.messageBox(
           "Error",
           "Geolocation services can not be accessed, the lead doesn't have a valid street address.",
@@ -245,19 +252,24 @@
         );
         frontEndController.hideLoading();
       } else {
-        $.getJSON( frontEndController.queryTranslationEndpoint.replace('{access_key}', dataKeyAPI).replace('{query}', frontEndController.results.new_street), {} )
-          .done(function( json ) {
+        $.getJSON(
+          frontEndController.queryTranslationEndpoint
+            .replace("{access_key}", dataKeyAPI)
+            .replace("{query}", frontEndController.results.new_street),
+          {}
+        )
+          .done(function (json) {
             frontEndController.geolocationData = json;
             frontEndController.parseGeolocation();
           })
-          .fail(function() {
+          .fail(function () {
             frontEndController.messageBox(
               "Service Down",
               "The geolocation service is currently down, please try again later.",
               "error"
             );
             frontEndController.hideLoading();
-        });
+          });
       }
     },
     getAjaxRequestLead: function () {
