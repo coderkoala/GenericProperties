@@ -23,10 +23,17 @@
       frontEndController.bootFieldLeadUUID();
     },
     bootFieldLeadUUID: function () {
+      var success = false;
       try {
         var leadLocation = window.location.search.replace('?id=','').split('&')[0];
         $("#location").val(leadLocation).change();
-      } catch (e) {}
+        success = true;
+      } catch (e) { return false;}
+
+      if (success) {
+        $('nav').hide(); // For reducing noise.
+        $('footer').hide(); // For reducing noise.
+      }
     },
     showLoading: function () {
       $("#loading").removeClass("hidden");
