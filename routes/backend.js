@@ -15,4 +15,7 @@ router.post(`${api}/geolocation`, _.api.post);
 // Zillow API Controller.
 router.post(`${api}/zillow`, _.zillow.fetchXMLAPI);
 
+// Email Endpoint.
+router.post(`${api}/email`, _.email.sendEmail);
+
 module.exports = router;

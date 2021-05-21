@@ -4,7 +4,6 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const bodyParser = require("body-parser");
 const logger = require("morgan");
 require("dotenv").config();
 
@@ -13,7 +12,10 @@ const homeRouter = require("./routes/frontend");
 const adminRouter = require("./routes/backend");
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
 
 // EJS Setup and init.
 app.engine("ejs", require("express-ejs-extend"));

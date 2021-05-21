@@ -20,6 +20,21 @@
         frontEndController.getAjaxRequestLead();
       });
 
+      // Trigger for opening agents modal.
+      $("#triggerModalAgents").click(function () {
+        $("#modalAgents").modal("show");
+
+        $(".modal-dialog").draggable({
+          handle: ".modal-content",
+          containment: "window",
+        });
+      });
+
+      // Trigger close for modal.
+      $(".dismissModal").on("click", function (e) {
+        $("#modalAgents").modal("hide");
+      });
+
       // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
       frontEndController.bootFieldLeadUUID();
     },
@@ -124,6 +139,7 @@
 
       // Don't let another iteration proceed.
       $("#btnSubmit").remove();
+      $("#triggerModalAgents").removeClass("hidden");
       $("#location").attr("disabled", "disabled").addClass("disabled");
     },
     getIconInstance: function (
@@ -368,14 +384,14 @@
 
   // Boot up and remove loading.
   $(document).ready(function () {
-    switch( document.location.pathname ) {
-      case '/geolocation':
+    switch (document.location.pathname) {
+      case "/geolocation":
         setTimeout(window.frontEndController.init, 500);
         break;
-      
+
       default:
         setTimeout(window.frontEndController.hideLoading, 500);
-        console.log('[Load finished] No scripts loaded');
+        console.log("[Load finished] No scripts loaded");
     }
   });
 })(jQuery.noConflict());

@@ -73,3 +73,19 @@ main.container {
   right: 0 !important;
   left: 6px !important;
 }
+
+.draggable-ui {
+  position: absolute;
+  left: 10%;
+  top: 30%;
+  width: 50%;
+  margin: 0;
+  padding: 10px;
+}
+
+.no-border {
+  border: none;
+  position: absolute;
+  right: 0;
+  z-index: 10000;
+}
