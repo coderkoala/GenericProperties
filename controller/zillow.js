@@ -20,7 +20,7 @@ class zillowController {
           } else {
             res.status(400).send({
               error:
-                "Couldn't retrieve data from remove server.",
+                "Couldn't retrieve data from remote server.",
             });
           }
         });  
