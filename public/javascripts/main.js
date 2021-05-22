@@ -3,7 +3,7 @@
   var frontEndController = {
     queryGeolocationEndpoint: "/geolocation",
     queryfetchAgentEndpoint:
-      "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}",
+      "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
     queryfetchSingleAgentEndpoint:
       "/api/v1/agent?dynamics_id={id}",
     queryTranslationEndpoint:
@@ -188,7 +188,8 @@
         endpoint = endpoint
           .replace("{latitude}", frontEndController.results.new_latitude)
           .replace("{longitude}", frontEndController.results.new_longitude)
-          .replace("{distance}", 5);
+          .replace("{distance}", 5)
+          .replace("{leadid}", frontEndController.results.leadid);
         frontEndController.showLoading();
         $.ajax({
           type: "POST",
