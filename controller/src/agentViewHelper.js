@@ -40,12 +40,13 @@ class AgentViewHelper {
       .trim();
   }
 
-  getTableTemplate(){
+  getTableTemplate() {
     return `<table class="table table-hover">
             {thead}
             <tbody>{tbody}</tbody>
-          </table>`      .replace(/\s{2,}/g, "")
-          .trim();;
+          </table>`
+      .replace(/\s{2,}/g, "")
+      .trim();
   }
 
   getIcon(param = "") {
