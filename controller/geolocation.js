@@ -1,6 +1,4 @@
 "use strict";
-const { QueryTypes } = require("sequelize");
-const db = require("../models");
 let DynamicsCrmRest = require("./src/dynamics");
 require("dotenv").config();
 

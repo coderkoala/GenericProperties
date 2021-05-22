@@ -18,4 +18,7 @@ router.post(`${api}/zillow`, _.zillow.fetchXMLAPI);
 // Email Endpoint.
 router.post(`${api}/email`, _.email.sendEmail);
 
+// Agent fetch single Endpoint.
+router.post(`${api}/agent`, _.agent.fetchAgentTuple);
+
 module.exports = router;
