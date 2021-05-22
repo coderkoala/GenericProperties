@@ -1,34 +1,35 @@
-(function ($) {
+(function ($, libMap) {
   "use strict";
-  var frontEndController = {
-    queryGeolocationEndpoint: "/geolocation",
-    queryfetchAgentEndpoint:
+  var this_ = {
+    currentPageRouteEndpoint: "/geolocation",
+    defaultDistanceToRenderNearbyAgents: 5,
+    fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
-    queryfetchSingleAgentEndpoint:
+    fetchSingleAgentDataAPIEndpoint:
       "/api/v1/agent?dynamics_id={id}",
-    queryTranslationEndpoint:
+    fetchForwardGeocodedValuesEndpoint:
       "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
-    tableTemplate:
+    mapPinTableContentForAgents:
       '<tr><th scope="row">{subject}</th><td>{new_fullname}</td><td>{new_latitude}</td><td>{new_longitude}</td></tr>',
-    init: function () {
-      frontEndController.hideLoading();
+    initDOM: function () {
+      this_.hideLoadingScreenComponent();
       $("input").on("input change keyup", function (e) {
-        frontEndController.validate(this);
+        this_.validateInputBoxValue(this);
       });
       $("input").on("blur", function (e) {
-        frontEndController.sanitize(this);
+        this_.sanitizeInputBoxValue(this);
       });
       $("#btnSubmit").on("click", function (e) {
-        frontEndController.getAjaxRequestLead();
+        this_.fetchLeadDatafromDynamics();
       });
 
       // Boot up the modals.
-      frontEndController.bootModals();
+      this_.initCurrentModalsInDOM();
 
       // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
-      frontEndController.bootFieldLeadUUID();
+      this_.fetchDynamicsLeadUUIDfromParentIFrame();
     },
-    bootModals: function () {
+    initCurrentModalsInDOM: function () {
       // Trigger for opening agents modal.
       $("#triggerModalAgents").click(function () {
         $("#modalAgents").modal("show");
@@ -41,106 +42,90 @@
 
       // Trigger close for modal.
       $(".dismissModal").on("click", function (e) {
-        frontEndController.closeCurrentModal(this);
+        this_.closeCurrentlyOpenedModal(this);
       });
     },
-    closeCurrentModal(e) {
+    closeCurrentlyOpenedModal(e) {
       $(e).parents().find(".modal").modal("hide");
     },
-    bootFieldLeadUUID: function () {
-      var skipBlockInvisibility = true;
-      try {
-        var leadLocation = window.location.search
-          .replace("?id=", "")
-          .split("&")[0];
-        $("#location").val(leadLocation).change();
-      } catch (e) {
-        skipBlockInvisibility = true;
-      }
-
-      if (!skipBlockInvisibility) {
-        $("nav").hide(); // For reducing noise.
-        $("footer").hide(); // For reducing noise.
-      }
-    },
-    showLoading: function () {
+    showLoadingScreenComponent: function () {
       $("#loading").removeClass("hidden");
     },
-    hideLoading: function () {
+    hideLoadingScreenComponent: function () {
       $("#loading").addClass("hidden");
     },
-    messageBox: function (title, message, type = "success") {
+    renderTableforMapPinContent: function () {
+      var arrayAgentsDataStored = this_.arrayAgentsDataStored;
+      var tableElement = $("#tableContent");
+      var dataToBeInjectedToTableRow = this_.mapPinTableContentForAgents;
+      dataToBeInjectedToTableRow = dataToBeInjectedToTableRow.replace(
+        "{subject}",
+        '<a target="_blank" href="' +
+          arrayAgentsDataStored.hotLink +
+          '">' +
+          arrayAgentsDataStored.subject +
+          "</a>"
+      );
+      dataToBeInjectedToTableRow = dataToBeInjectedToTableRow.replace(
+        "{new_latitude}",
+        arrayAgentsDataStored.new_latitude
+      );
+      dataToBeInjectedToTableRow = dataToBeInjectedToTableRow.replace(
+        "{new_longitude}",
+        arrayAgentsDataStored.new_longitude
+      );
+      dataToBeInjectedToTableRow = dataToBeInjectedToTableRow.replace(
+        "{new_fullname}",
+        arrayAgentsDataStored.new_fullname
+      );
+      tableElement.empty().append(dataToBeInjectedToTableRow);
+      this_.hideLoadingScreenComponent();
+      // $("#tableau").removeClass("hidden"); For development.
+      // $("#tableau").fadeIn("slow");
+    },
+    renderMessageBoxSWAL: function (title, message, type = "success") {
       Swal.fire({
         title: title,
         icon: type,
         html: message,
       });
     },
-    renderTableResults: function () {
-      var results = frontEndController.results;
-      var tableName = $("#tableContent");
-      var tableInjectRow = frontEndController.tableTemplate;
-      tableInjectRow = tableInjectRow.replace(
-        "{subject}",
-        '<a target="_blank" href="' +
-          results.hotLink +
-          '">' +
-          results.subject +
-          "</a>"
-      );
-      tableInjectRow = tableInjectRow.replace(
-        "{new_latitude}",
-        results.new_latitude
-      );
-      tableInjectRow = tableInjectRow.replace(
-        "{new_longitude}",
-        results.new_longitude
-      );
-      tableInjectRow = tableInjectRow.replace(
-        "{new_fullname}",
-        results.new_fullname
-      );
-      tableName.empty().append(tableInjectRow);
-      frontEndController.hideLoading();
-      // $("#tableau").removeClass("hidden"); For development.
-      // $("#tableau").fadeIn("slow");
-    },
-    renderMap: function () {
-      var element = document.getElementById("map");
-      element.style = "height:600px;";
-      frontEndController.map = L.map(element);
+    renderMapToDOM: function () {
+      var mapElement = document.getElementById("map");
+      mapElement.style = "height:600px;";
+      this_.globalMapSelectorElement = libMap.map(mapElement);
 
-      frontEndController.map.attributionControl.setPrefix(
+      this_.globalMapSelectorElement.attributionControl.setPrefix(
         '&copy; 2021 <a href="http://nobeldahal.com.np" target="_blank">Nobel Dahal</a>'
       );
-      L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+      libMap.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(frontEndController.map);
+      }).addTo(this_.globalMapSelectorElement);
 
       // Target's GPS coordinates.
-      var target = L.latLng(
-        frontEndController.results.new_latitude,
-        frontEndController.results.new_longitude
+      var mapPinForIndividualAgent = libMap.latLng(
+        this_.arrayAgentsDataStored.new_latitude,
+        this_.arrayAgentsDataStored.new_longitude
       );
-      var leadCenterLatLong = L.latLng(
-        frontEndController.results.new_latitude,
-        frontEndController.results.new_longitude
+      var leadsPositionInMap = libMap.latLng(
+        this_.arrayAgentsDataStored.new_latitude,
+        this_.arrayAgentsDataStored.new_longitude
       );
-      frontEndController.map.setView(target, 14);
+      this_.globalMapSelectorElement.setView(mapPinForIndividualAgent, 14);
 
       var subject =
         '<a target="_blank" href="' +
-        frontEndController.results.hotLink +
+        this_.arrayAgentsDataStored.hotLink +
         '">' +
-        frontEndController.results.subject +
+        this_.arrayAgentsDataStored.subject +
         "</a>";
 
       // Add marker.
-      L.marker(leadCenterLatLong, {
-        icon: frontEndController.getIconInstance(),
+      libMap.marker(leadsPositionInMap, {
+        icon: this_.renderCustomMapPinsGenerator(),
       })
-        .addTo(frontEndController.map)
+        .addTo(this_.globalMapSelectorElement)
         .bindPopup(subject, {
           closeOnClick: false,
           autoClose: false,
@@ -151,11 +136,11 @@
       $("#triggerModalAgents").removeClass("hidden");
       $("#location").attr("disabled", "disabled").addClass("disabled");
     },
-    getIconInstance: function (
+    renderCustomMapPinsGenerator: function (
       icon = "/stylesheets/images/home.png",
       dimensions = [25, 25]
     ) {
-      var customIcon = L.Icon.extend({
+      var customIcon = libMap.Icon.extend({
         options: {
           iconSize: dimensions,
         },
@@ -165,61 +150,113 @@
         iconUrl: icon,
       });
     },
-    fetchAgentCoordinatesPOST: function () {
-      var endpoint = frontEndController.queryfetchAgentEndpoint;
+    renderMapPinsforAgentsFromRemoteResult: function () {
+      var localAgentDataStored = this_.agentarrayAgentsDataStored;
+
+      Object.keys(localAgentDataStored.data).forEach(function (stringCoordinatesLatitudeLongitude) {
+        var singleAgentTuple = localAgentDataStored.data[stringCoordinatesLatitudeLongitude];
+        var arrayCoordinatesLatitudeLongitude = stringCoordinatesLatitudeLongitude.split(",");
+
+        // Initiate Marker
+        var agentsPositionInMap = libMap.latLng(
+          arrayCoordinatesLatitudeLongitude[0],
+          arrayCoordinatesLatitudeLongitude[1]
+        );
+
+        // Override icon from class instantiation.
+        libMap.marker(agentsPositionInMap, {
+          icon: this_.renderCustomMapPinsGenerator(
+            "/stylesheets/images/user.png",
+            [18, 25]
+          ),
+        })
+          .addTo(this_.globalMapSelectorElement)
+          .bindPopup(localAgentDataStored.template.replace("{0}", singleAgentTuple), {
+            closeOnClick: false,
+            autoClose: false,
+          });
+      });
+    },
+    renderMapBeforeFetchingForwardGeocodedCoordinates: function () {
+      var firstElementinArrayGeocodedData = this_.arrayForwardGeocodedDataStored.data.pop();
+      this_.arrayAgentsDataStored.new_latitude = firstElementinArrayGeocodedData.latitude;
+      this_.arrayAgentsDataStored.new_longitude = firstElementinArrayGeocodedData.longitude;
+
+      // Initiate recovery.
+      this_.renderTableforMapPinContent();
+      this_.renderMapToDOM();
+      this_.fetchNearbyAgentsDatafromBackend();
+    },
+    fetchDynamicsLeadUUIDfromParentIFrame: function () {
+      var flagSkipHidingUIComponents = true;
+      try {
+        var leadUUIDfromParentIFrame = window.location.search
+          .replace("?id=", "")
+          .split("&")[0];
+        $("#location").val(leadUUIDfromParentIFrame).change();
+      } catch (e) {
+        flagSkipHidingUIComponents = true;
+      }
+
+      if (!flagSkipHidingUIComponents) {
+        $("nav").hide(); // For reducing noise.
+        $("footer").hide(); // For reducing noise.
+      }
+    },
+    fetchNearbyAgentsDatafromBackend: function () {
+      var endpointLocalRemoteAgents = this_.fetchRemoteAgentsAPIEndpoint;
       if (
-        null === frontEndController.results.new_longitude ||
-        null === frontEndController.results.new_latitude ||
-        isNaN(frontEndController.results.new_latitude) ||
-        isNaN(frontEndController.results.new_longitude) ||
-        !isFinite(frontEndController.results.new_latitude) ||
-        Math.abs(frontEndController.results.new_latitude) > 90 ||
-        !isFinite(frontEndController.results.new_longitude) ||
-        Math.abs(frontEndController.results.new_longitude) > 180
+        null === this_.arrayAgentsDataStored.new_longitude ||
+        null === this_.arrayAgentsDataStored.new_latitude ||
+        isNaN(this_.arrayAgentsDataStored.new_latitude) ||
+        isNaN(this_.arrayAgentsDataStored.new_longitude) ||
+        !isFinite(this_.arrayAgentsDataStored.new_latitude) ||
+        Math.abs(this_.arrayAgentsDataStored.new_latitude) > 90 ||
+        !isFinite(this_.arrayAgentsDataStored.new_longitude) ||
+        Math.abs(this_.arrayAgentsDataStored.new_longitude) > 180
       ) {
         // Render div for error handling
-        console.log("Handle exception for validation issue with no latLong!");
-        frontEndController.messageBox(
+        this_.renderMessageBoxSWAL(
           "Agents Found",
           "Exception occured during validation: Issue with no valid latitude and longitude coordinates.",
           "error"
         );
       } else {
-        endpoint = endpoint
-          .replace("{latitude}", frontEndController.results.new_latitude)
-          .replace("{longitude}", frontEndController.results.new_longitude)
-          .replace("{distance}", 5)
-          .replace("{leadid}", frontEndController.results.leadid);
-        frontEndController.showLoading();
+        endpointLocalRemoteAgents = endpointLocalRemoteAgents
+          .replace("{latitude}", this_.arrayAgentsDataStored.new_latitude)
+          .replace("{longitude}", this_.arrayAgentsDataStored.new_longitude)
+          .replace("{distance}", this_.defaultDistanceToRenderNearbyAgents || 5)
+          .replace("{leadid}", this_.arrayAgentsDataStored.leadid);
+        this_.showLoadingScreenComponent();
         $.ajax({
           type: "POST",
           contentType: "application/json; charset=utf-8",
           datatype: "json",
-          url: endpoint,
-          success: function (results) {
-            frontEndController.agentResults = results;
-            frontEndController.hideLoading();
-            var size = Object.keys(frontEndController.agentResults.data).length;
+          url: endpointLocalRemoteAgents,
+          success: function (arrayAgentsDataStored) {
+            this_.agentarrayAgentsDataStored = arrayAgentsDataStored;
+            this_.hideLoadingScreenComponent();
+            var size = Object.keys(this_.agentarrayAgentsDataStored.data).length;
             if (size) {
-              frontEndController.messageBox(
+              this_.renderMessageBoxSWAL(
                 "Agents Found",
                 "Was able to compute " +
                   size +
                   " nearby points. Map will be updated shortly.",
                 "success"
               );
-              frontEndController.renderAgentResults();
+              this_.renderMapPinsforAgentsFromRemoteResult();
             } else {
-              frontEndController.messageBox(
+              this_.renderMessageBoxSWAL(
                 "No nearby Agents found",
                 "The system was unable to find any nearby agents in the vicinity(5 KM) of the lead. Please broaden your choice and try again.",
                 "error"
               );
             }
           },
-          error: function (xhr) {
-            frontEndController.hideLoading();
-            frontEndController.messageBox(
+          error: function () {
+            this_.hideLoadingScreenComponent();
+            this_.renderMessageBoxSWAL(
               "Failed Computing Agents",
               "A network issue prevented from computing Agents locations around the lead. Please try again later.",
               "error"
@@ -228,87 +265,50 @@
         });
       }
     },
-    renderAgentResults: function () {
-      var fetchedAgents = frontEndController.agentResults;
-
-      Object.keys(fetchedAgents.data).forEach(function (coordinateLatLong) {
-        var singleAgentTuple = fetchedAgents.data[coordinateLatLong];
-        var splitCoordinates = coordinateLatLong.split(",");
-
-        // Initiate Marker
-        var leadCenterLatLong = L.latLng(
-          splitCoordinates[0], // Latitude.
-          splitCoordinates[1] // Longitude.
-        );
-
-        // Override icon from class instantiation.
-        L.marker(leadCenterLatLong, {
-          icon: frontEndController.getIconInstance(
-            "/stylesheets/images/user.png",
-            [18, 25]
-          ),
-        })
-          .addTo(frontEndController.map)
-          .bindPopup(fetchedAgents.template.replace("{0}", singleAgentTuple), {
-            closeOnClick: false,
-            autoClose: false,
-          });
-      });
-    },
-    parseGeolocation: function () {
-      var singleTuple = frontEndController.geolocationData.data.pop();
-      frontEndController.results.new_latitude = singleTuple.latitude;
-      frontEndController.results.new_longitude = singleTuple.longitude;
-
-      // Initiate recovery.
-      frontEndController.renderTableResults();
-      frontEndController.renderMap();
-      frontEndController.fetchAgentCoordinatesPOST();
-    },
-    fetchGeolocation: function () {
-      var dataKeyAPI = $("main").data("key");
+    fetchForwardGeocodedCoordinatesFromStreetAddress: function () {
+      var apiKeyGeolocationService = $("main").data("key");
       if (
-        null === frontEndController.results.new_street ||
-        !frontEndController.results.new_street
+        null === this_.arrayAgentsDataStored.new_street ||
+        !this_.arrayAgentsDataStored.new_street
       ) {
-        frontEndController.messageBox(
+        this_.renderMessageBoxSWAL(
           "Error",
           "Geolocation services can not be accessed, the lead doesn't have a valid street address.",
           "error"
         );
-        frontEndController.hideLoading();
+        this_.hideLoadingScreenComponent();
       } else {
         $.getJSON(
-          frontEndController.queryTranslationEndpoint
-            .replace("{access_key}", dataKeyAPI)
-            .replace("{query}", frontEndController.results.new_street),
+          this_.fetchForwardGeocodedValuesEndpoint
+            .replace("{access_key}", apiKeyGeolocationService)
+            .replace("{query}", this_.arrayAgentsDataStored.new_street),
           {}
         )
           .done(function (json) {
-            frontEndController.geolocationData = json;
-            frontEndController.parseGeolocation();
+            this_.arrayForwardGeocodedDataStored = json;
+            this_.renderMapBeforeFetchingForwardGeocodedCoordinates();
           })
           .fail(function () {
-            frontEndController.messageBox(
+            this_.renderMessageBoxSWAL(
               "Service Down",
               "The geolocation service is currently down, please try again later.",
               "error"
             );
-            frontEndController.hideLoading();
+            this_.hideLoadingScreenComponent();
           });
       }
     },
-    getAjaxRequestLead: function () {
-      frontEndController.showLoading();
+    fetchLeadDatafromDynamics: function () {
+      this_.showLoadingScreenComponent();
       $("#tableau").fadeOut("slow");
       $("input").change();
       if ($(".is-invalid").length) {
-        frontEndController.messageBox(
+        this_.renderMessageBoxSWAL(
           "Error",
           "Invalid Lead UUID detected, computation can not occur without valid Lead UUID.",
           "error"
         );
-        frontEndController.hideLoading();
+        this_.hideLoadingScreenComponent();
         return;
       }
       $.ajax({
@@ -316,37 +316,36 @@
         contentType: "application/json; charset=utf-8",
         datatype: "json",
         data: JSON.stringify({ location: $("#location").val() }),
-        url: frontEndController.queryGeolocationEndpoint,
-        success: function (results) {
-          frontEndController.results = results;
+        url: this_.currentPageRouteEndpoint,
+        success: function (arrayAgentsDataStored) {
+          this_.arrayAgentsDataStored = arrayAgentsDataStored;
           if (
-            null === results.new_longitude ||
-            null === results.latitude ||
-            false === results.new_longitude ||
-            false === results.new_latitude ||
-            isNaN(results.new_latitude) ||
-            isNaN(results.new_longitude) ||
-            !isFinite(results.new_latitude) ||
-            Math.abs(results.new_latitude) > 90 ||
-            !isFinite(results.new_longitude) ||
-            Math.abs(results.new_longitude) > 180
+            null === arrayAgentsDataStored.new_longitude ||
+            null === arrayAgentsDataStored.latitude ||
+            false === arrayAgentsDataStored.new_longitude ||
+            false === arrayAgentsDataStored.new_latitude ||
+            isNaN(arrayAgentsDataStored.new_latitude) ||
+            isNaN(arrayAgentsDataStored.new_longitude) ||
+            !isFinite(arrayAgentsDataStored.new_latitude) ||
+            Math.abs(arrayAgentsDataStored.new_latitude) > 90 ||
+            !isFinite(arrayAgentsDataStored.new_longitude) ||
+            Math.abs(arrayAgentsDataStored.new_longitude) > 180
           ) {
-            frontEndController.messageBox(
+            this_.renderMessageBoxSWAL(
               "Invalid coordinates detected",
               "The script detected invalid coordinates, will now attempt to geocode the data. ",
               "warning"
             );
-            frontEndController.fetchGeolocation();
-            // @todo, introduce recoverability mechanics here.
+            this_.fetchForwardGeocodedCoordinatesFromStreetAddress();
           } else {
-            frontEndController.renderTableResults();
-            frontEndController.renderMap();
-            frontEndController.fetchAgentCoordinatesPOST();
+            this_.renderTableforMapPinContent();
+            this_.renderMapToDOM();
+            this_.fetchNearbyAgentsDatafromBackend();
           }
         },
         error: function (xhr) {
-          frontEndController.hideLoading();
-          frontEndController.messageBox(
+          this_.hideLoadingScreenComponent();
+          this_.renderMessageBoxSWAL(
             "Failed Retrieving Leads",
             xhr.responseJSON.error,
             "error"
@@ -354,54 +353,54 @@
         },
       });
     },
-    validate: function (ele) {
-      var $this = $(ele);
-      $this.removeClass("is-invalid");
-      var $type = $this.attr("validation");
+    validateInputBoxValue: function (ele) {
+      var $selectedElement = $(ele);
+      $selectedElement.removeClass("is-invalid");
+      var $type = $selectedElement.attr("validation");
       switch ($type) {
         case "location":
-          if ($this.val().match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)) {
-            $this.addClass("is-invalid");
+          if ($selectedElement.val().match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)) {
+            $selectedElement.addClass("is-invalid");
           }
           break;
       }
     },
-    UUIDMatcher: function (str) {
+    sanitizeInputBoxValue: function (ele) {
+      var $selectedElementToSanitize = $(ele);
+      var sanitizedValue = $selectedElementToSanitize.val();
+      sanitizedValue = sanitizedValue.replace(
+        /(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i,
+        ""
+      );
+      sanitizedValue = sanitizedValue.replace(/\s{2,}/g, " ");
+      sanitizedValue = sanitizedValue.trim();
+
+      if (this_.matchRegexUUID(sanitizedValue)) {
+        sanitizedValue = this_.matchRegexUUID(sanitizedValue)[0].slice(4);
+        $selectedElementToSanitize.val(sanitizedValue).change();
+      } else {
+        $selectedElementToSanitize.val(sanitizedValue).change();
+      }
+    },
+    matchRegexUUID: function (str) {
       return str.match(
         /&id=\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
       );
     },
-    sanitize: function (ele) {
-      var $this = $(ele);
-      var newValue = $this.val();
-      newValue = newValue.replace(
-        /(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i,
-        ""
-      );
-      newValue = newValue.replace(/\s{2,}/g, " ");
-      newValue = newValue.trim();
-
-      if (frontEndController.UUIDMatcher(newValue)) {
-        newValue = frontEndController.UUIDMatcher(newValue)[0].slice(4);
-        $this.val(newValue).change();
-      } else {
-        $this.val(newValue).change();
-      }
-    },
   };
 
-  window.frontEndController = frontEndController;
+  window.this_ = this_;
 
   // Boot up and remove loading.
   $(document).ready(function () {
     switch (document.location.pathname) {
       case "/geolocation":
-        setTimeout(window.frontEndController.init, 500);
+        setTimeout(window.this_.initDOM, 500);
         break;
 
       default:
-        setTimeout(window.frontEndController.hideLoading, 500);
+        setTimeout(window.this_.hideLoadingScreenComponent, 500);
         console.log("[Load finished] No scripts loaded");
     }
   });
-})(jQuery.noConflict());
+})(jQuery.noConflict(), L);
