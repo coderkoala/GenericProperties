@@ -16,14 +16,14 @@ main.container {
   margin-bottom: 4rem;
 }
 
-#loading{
-  background-color:#fff;
-  position:fixed;
-  width:100%;
-  height:100%;
-  top:0px;
-  left:0px;
-  z-index:1000;
+#loading {
+  background-color: #fff;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
   opacity: 75%;
 }
 
@@ -37,7 +37,7 @@ main.container {
 }
 
 .hidden {
-  visibility:collapse;
+  visibility: collapse;
 }
 
 #tableau {
@@ -56,17 +56,17 @@ main.container {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: #f1f1f1;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }
 
 .leaflet-popup-close-button {
@@ -78,7 +78,7 @@ main.container {
   position: absolute;
   left: 10%;
   top: 30%;
-  width: 50%;
+  min-width: 60%;
   margin: 0;
   padding: 10px;
 }
@@ -88,4 +88,14 @@ main.container {
   position: absolute;
   right: 0;
   z-index: 10000;
+}
+
+#tableAgentsListView {
+  max-height: 10rem;
+  overflow: auto;
+}
+
+#search {
+  max-width: 40%;
+  margin: 1rem;
 }

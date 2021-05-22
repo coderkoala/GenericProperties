@@ -20,6 +20,12 @@
         frontEndController.getAjaxRequestLead();
       });
 
+      frontEndController.bootModals();
+
+      // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
+      frontEndController.bootFieldLeadUUID();
+    },
+    bootModals : function(){
       // Trigger for opening agents modal.
       $("#triggerModalAgents").click(function () {
         $("#modalAgents").modal("show");
@@ -32,11 +38,11 @@
 
       // Trigger close for modal.
       $(".dismissModal").on("click", function (e) {
-        $("#modalAgents").modal("hide");
+        frontEndController.closeCurrentModal(this);
       });
-
-      // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
-      frontEndController.bootFieldLeadUUID();
+    },
+    closeCurrentModal(e){
+      $(e).parents().find('.modal').modal('hide');
     },
     bootFieldLeadUUID: function () {
       var skipBlockInvisibility = true;
