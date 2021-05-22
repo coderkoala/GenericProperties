@@ -99,3 +99,12 @@ main.container {
   max-width: 40%;
   margin: 1rem;
 }
+
+/** Firefox workaround for https://github.com/Leaflet/Leaflet/issues/4686 */
+.leaflet-fade-anim .leaflet-tile {
+  will-change: auto !important;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  will-change: auto !important;
+}
