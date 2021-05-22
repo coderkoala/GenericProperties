@@ -2,6 +2,7 @@
 require("dotenv").config();
 const { QueryTypes } = require("sequelize");
 const db = require("../models");
+const cacheClass = require("persistent-cache");
 let DynamicsCrmRest = require("./src/dynamics");
 
 class homeController {
@@ -13,6 +14,7 @@ class homeController {
   }
 
   async post(req, res) {
+    const leadid = req.query.leadid || false;
     let hotLink = process.env.dynamics_crm_record_link.replace(
       "{entity}",
       "cr4f2_agentsandrealtor"
@@ -39,36 +41,57 @@ class homeController {
       });
     }
 
-    let sqlQuery = `
-    SELECT 
-    name, address, email, CONCAT('${hotLink}',geolocation.id) as url,
-    ST_Y(coordinates) AS latitude,
-    ST_X(coordinates) AS longitude,
-    (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
-    * COS(RADIANS(ST_X(coordinates)) - RADIANS(${coordinates.longitude})) + SIN(RADIANS(${coordinates.latitude}))
-    * SIN(RADIANS(ST_Y(coordinates))))) AS distance
-    FROM geolocation
-    WHERE MBRContains
-        (
-        LineString
-            (
-            Point (
-                ${coordinates.longitude} + ${coordinates.distance} / (111.320 * COS(RADIANS(${coordinates.latitude}))),
-                ${coordinates.latitude} + ${coordinates.distance} / 111.133
-            ),
-            Point (
-                ${coordinates.longitude} - ${coordinates.distance} / (111.320 * COS(RADIANS(${coordinates.latitude}))),
-                ${coordinates.latitude} - ${coordinates.distance} / 111.133
-            )
-        ),
-        coordinates
-        )
-    HAVING distance < ${coordinates.distance}
-    ORDER By distance`;
-
-    const resultsAgents = await db.sequelize.query(sqlQuery, {
-      type: QueryTypes.SELECT,
+    // Only run query if cache misses.
+    let resultsAgents = null;
+    let pollCache = null;
+    let cache = cacheClass({
+      base: "logs",
+      name: "cacheDB",
+      duration: 3600000,
     });
+
+    if (leadid) {
+      pollCache = cache.getSync(leadid);
+    }
+
+    if (pollCache && undefined !== pollCache.parsedData) {
+      // Cache hit!
+      res.json({
+        data: pollCache.parsedData,
+        template: `<table class="table table-hover"><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`,
+      });
+      return;
+    } else {
+      let sqlQuery = `
+      SELECT 
+      id, name, address, email, CONCAT('${hotLink}',geolocation.id) as url,
+      ST_Y(coordinates) AS latitude,
+      ST_X(coordinates) AS longitude,
+      (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
+      * COS(RADIANS(ST_X(coordinates)) - RADIANS(${coordinates.longitude})) + SIN(RADIANS(${coordinates.latitude}))
+      * SIN(RADIANS(ST_Y(coordinates))))) AS distance
+      FROM geolocation
+      WHERE MBRContains
+          (
+          LineString
+              (
+              Point (
+                  ${coordinates.longitude} + ${coordinates.distance} / (111.320 * COS(RADIANS(${coordinates.latitude}))),
+                  ${coordinates.latitude} + ${coordinates.distance} / 111.133
+              ),
+              Point (
+                  ${coordinates.longitude} - ${coordinates.distance} / (111.320 * COS(RADIANS(${coordinates.latitude}))),
+                  ${coordinates.latitude} - ${coordinates.distance} / 111.133
+              )
+          ),
+          coordinates
+          )
+      HAVING distance < ${coordinates.distance}
+      ORDER By distance`;
+      resultsAgents = await db.sequelize.query(sqlQuery, {
+        type: QueryTypes.SELECT,
+      });
+    }
 
     let agentsParsed = {};
     let rowTemplate = `<tr><td>{0}</td><td>{1}</td></tr>`;
@@ -93,6 +116,12 @@ class homeController {
 
       agentsParsed[index] += rowToBeConcatenated;
     });
+
+    // Finally, set cache.
+    if (leadid) {
+      cache.putSync(leadid, { parsedData: agentsParsed });
+      cache.putSync(`${leadid}-raw`, { rawData: resultsAgents });
+    }
 
     res.json({
       data: agentsParsed,
