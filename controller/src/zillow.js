@@ -8,8 +8,11 @@ class ZillowREST {
       baseURL: `https://www.zillow.com/webservice/GetZestimate.htm?zws-id=${process.env.zillow_api_key}&zpid=${zillowPropertyID}`,
       timeout: 0,
       transformResponse: (res) => {
-        // Do your own parsing here if needed ie JSON.parse(res);
-        return res;
+        if ( 'string' === typeof res ) {
+          return res;
+        } else {
+          return res.toString();
+        }
       },
     });
     return instance.get().catch((error) => error);
