@@ -6,7 +6,7 @@
     fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
     fetchRemoteAgentsCollectionsCachedAPIEndpoint: "/api/v1/agents?id={leadid}",
-    fetchSingleAgentDataAPIEndpoint: "/api/v1/agent?dynamics_id={id}",
+    fetchSingleAgentDataAPIEndpoint: "/api/v1/agent?id={id}",
     fetchForwardGeocodedValuesEndpoint:
       "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
     mapPinTableContentForAgents:
@@ -59,6 +59,38 @@
     hideLoadingScreenComponent: function () {
       $("#loading").addClass("hidden");
     },
+    renderCurrentlySelectedAgentAsModal: function (e) {
+      var $this = $(this);
+
+      var id = $this.parents().closest("tr").data("id");
+
+      glMSV.showLoadingScreenComponent();
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        datatype: "json",
+        url: glMSV.fetchSingleAgentDataAPIEndpoint.replace("{id}", id),
+        success: function (dataFetchedFromRemoteServer) {
+          glMSV.renderPopOverSWALHTML(
+            dataFetchedFromRemoteServer.title,
+            dataFetchedFromRemoteServer.data,
+            null,
+            null,
+            "70%"
+          );
+
+          glMSV.hideLoadingScreenComponent();
+        },
+        error: function (data) {
+          glMSV.hideLoadingScreenComponent();
+          glMSV.renderPopOverSWALHTML(
+            data.title || "Error",
+            data.message || "Network Error occured. Please try again later.",
+            data.icon || "error"
+          );
+        },
+      });
+    },
     renderTableforMapPinContent: function () {
       var arrayLeadDataStored = glMSV.arrayLeadDataStored;
       var tableElement = $("#tableContent");
@@ -106,13 +138,15 @@
       title,
       message,
       type = null,
-      callback = null
+      callback = null,
+      width = null
     ) {
       try {
         Swal.fire({
           title: title,
           html: message,
           icon: type,
+          width: width,
           showCloseButton: true,
           showConfirmButton: false,
         }).then(callback);
@@ -242,17 +276,13 @@
         success: function (arrayAgentsCachedCollectionData) {
           glMSV.arrayAgentsCachedCollectionData =
             arrayAgentsCachedCollectionData;
-          glMSV.renderMessageBoxSWAL(
-            arrayAgentsCachedCollectionData.title,
-            arrayAgentsCachedCollectionData.message,
-            arrayAgentsCachedCollectionData.icon,
-            function () {
-              $("#tableAgentsListView")
-                .empty()
-                .append(glMSV.arrayAgentsCachedCollectionData.data);
-              $("#modalAgents").modal("show");
-            }
-          );
+          $("#tableAgentsListView")
+            .empty()
+            .append(glMSV.arrayAgentsCachedCollectionData.data);
+          $(".view-single")
+            .off()
+            .on("click", glMSV.renderCurrentlySelectedAgentAsModal);
+          $("#modalAgents").modal("show");
           glMSV.hideLoadingScreenComponent();
         },
         error: function (data) {
@@ -445,6 +475,13 @@
               .match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)
           ) {
             $selectedElement.addClass("is-invalid");
+          }
+          break;
+        case "search":
+          if ($selectedElement.val().match(/(^\s+$|^$)/i)) {
+            $(".filtered").removeClass("filtered");
+          } else {
+            glMSV.filterOutput($selectedElement.val());
           }
           break;
       }
