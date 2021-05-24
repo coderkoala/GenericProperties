@@ -386,7 +386,7 @@
           glMSV.hideLoadingScreenComponent();
           glMSV.renderMessageBoxSWAL(
             "Failed Retrieving Leads",
-            xhr.responseJSON.error,
+            "Server was unable to fulfill your request.",
             "error"
           );
         },
