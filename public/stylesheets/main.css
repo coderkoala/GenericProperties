@@ -23,7 +23,7 @@ main.container {
   height: 100%;
   top: 0px;
   left: 0px;
-  z-index: 1000;
+  z-index: 9999999;
   opacity: 75%;
 }
 
@@ -111,4 +111,8 @@ main.container {
 
 .clickable{
   cursor: pointer;
+}
+
+.filtered{
+  display:none;
 }
