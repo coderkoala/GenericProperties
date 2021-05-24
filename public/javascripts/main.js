@@ -503,6 +503,23 @@
         $selectedElementToSanitize.val(sanitizedValue).change();
       }
     },
+    filterOutput: function (query) {
+      var filteredResults = $(".agentSingle")
+        .map(function () {
+          return $(this).data("value");
+        })
+        .get();
+      var result = filteredResults.filter((el) => el.includes(query));
+      glMSV.showOnlyViableAgentRows(result);
+    },
+    showOnlyViableAgentRows: function (filteredResults) {
+      $(`div#tableAgentsListView>table>tbody>tr`).addClass("filtered");
+      filteredResults.forEach(function (singleValue) {
+        $(`.agentSingle[data-value="${singleValue}"]:hidden`)
+          .closest("tr")
+          .removeClass("filtered");
+      });
+    },
     matchRegexUUID: function (str) {
       return str.match(
         /&id=\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
