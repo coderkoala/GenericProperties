@@ -60,7 +60,7 @@ class AgentViewHelper {
     // Used ES6 templating for readability.
     return `<tr data-id="{id}">
               <td>
-                  <input data-check="{id}" class="form-check-input agent-selector" type="checkbox" value="">
+                  <input data-check="{email}" class="form-check-input agent-selector" type="checkbox" value="">
               </td>
               
               <td>
@@ -82,7 +82,7 @@ class AgentViewHelper {
               <tr>
                 <th></th>
                 <th>Agent</th>
-                <th>Actions</th>
+                <th><button id="sendEmailAgents" class="btn btn-outline-dark">Send Bulk mail</button></th>
               </tr>
             </thead>`
       .replace(/\s{2,}/g, "")
@@ -119,6 +119,7 @@ class AgentViewHelper {
     return this.getRowTemplate()
       .replace(/{id}/g, singleTuple.id)
       .replace(/{name}/g, singleTuple.name)
+      .replace("{email}", singleTuple.email)
       .replace("{hotlink}", singleTuple.url)
       .replace(
         "{map_link}",
