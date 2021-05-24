@@ -282,14 +282,17 @@
           $(".view-single")
             .off()
             .on("click", glMSV.renderCurrentlySelectedAgentAsModal);
+          $("#sendEmailAgents")
+            .off()
+            .on("click", glMSV.fetchCheckedBoxesForEmailingAgents);
           $("#modalAgents").modal("show");
           glMSV.hideLoadingScreenComponent();
         },
         error: function (data) {
           glMSV.hideLoadingScreenComponent();
           glMSV.renderMessageBoxSWAL(
-            data.title || "Error",
-            data.message || "Network Error occured. Please try again later.",
+            data.title || "Session has expired",
+            data.message || "Computed data no longer available, please refresh the window and try again.",
             data.icon || "error"
           );
         },
@@ -462,6 +465,29 @@
           );
         },
       });
+    },
+    fetchCheckedBoxesForEmailingAgents: function () {
+      var data = [];
+
+      $(".agent-selector").each( function(i, tuple) {
+        if ($(tuple).is(":checked")) {
+          data.push($(tuple).data("check"));
+        }
+      });
+
+      if (!data.length) {
+        glMSV.renderMessageBoxSWAL(
+          'Invalid Selection',
+          'No Agents selected. Please select agents via the checkbox button.',
+          'error'
+        );
+      } else {
+        glMSV.pushAgentsIDToServerForEmailing(data);
+      }
+    },
+    pushAgentsIDToServerForEmailing: function(data){
+      var leadIDToSend = glMSV.arrayLeadDataStored.leadid;
+      console.log( data, leadIDToSend );
     },
     validateInputBoxValue: function (ele) {
       var $selectedElement = $(ele);
