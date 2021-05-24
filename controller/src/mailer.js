@@ -2,6 +2,7 @@
 require("dotenv").config();
 let nodemailer = require("nodemailer");
 let logger = require('./logger');
+let template = require('./emailTemplateHelper');
 
 class Mailer {
   handleEmailResponse( errorResponse, response ) {
@@ -9,7 +10,7 @@ class Mailer {
       logger.error(errorResponse);      
       return false;
     } else {
-      logger.info(errorResponse);      
+      logger.info('[Success] Email dispatched successfully.');      
       return response;
     }
   }
@@ -26,18 +27,20 @@ class Mailer {
   }
 
   prepareMail(param) {
+    let email = new template();
     return {
       from: param.from || process.env.email_username,
-      to: param.to,
+      to: param.to.pop(),
+      bcc: param.to,
       subject: param.subject,
-      html: param.html,
+      html: email.getEmailBasic(),
     };
   }
 
-  async sendMail(params, res) {
-    this.res = res;
+  async sendMail(req, res) {
     let mailTransporter = await this.getTransporter();
-    mailTransporter.sendMail(this.prepareMail(params), this.handleEmailResponse);
+    mailTransporter.sendMail(this.prepareMail(req), this.handleEmailResponse);
+
   }
 }
 
