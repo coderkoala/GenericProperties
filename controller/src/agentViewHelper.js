@@ -66,29 +66,29 @@ class AgentViewHelper {
     return this.params;
   }
 
-  reducerAgentsCollection(accumulator, singleTuple) {
-    return (
-      String(accumulator) +
-      this.getRowTemplate()
-        .replace("{id}", singleTuple.id)
-        .replace("{name}", singleTuple.name)
-        .replace("{hotlink}", singleTuple.url)
-        .replace(
-          "{map_link}",
-          `https://maps.google.com/maps?q=${singleTuple.latitude},${singleTuple.longitude}`
-        )
-        .replace("{icon-map}", this.getIcon("pin"))
-        .replace("{icon-eye}", this.getIcon("eye"))
-        .replace("{icon-mail}", this.getIcon("mail"))
-    );
+  reducerAgentsCollection(singleTuple) {
+    return this.getRowTemplate()
+      .replace("{id}", singleTuple.id)
+      .replace("{name}", singleTuple.name)
+      .replace("{hotlink}", singleTuple.url)
+      .replace(
+        "{map_link}",
+        `https://maps.google.com/maps?q=${singleTuple.latitude},${singleTuple.longitude}`
+      )
+      .replace("{icon-map}", this.getIcon("pin"))
+      .replace("{icon-eye}", this.getIcon("eye"))
+      .replace("{icon-mail}", this.getIcon("mail"));
   }
 
   outputAgentsCollection() {
     let content = "";
     this.params.forEach((singleTuple) => {
-      this.reducerAgentsCollection(content, singleTuple);
+      content += this.reducerAgentsCollection(singleTuple);
     });
-    return content;
+
+    return this.getTableTemplate()
+      .replace("{thead}", this.getTableHeadTemplate())
+      .replace("{tbody}", content);
   }
 }
 

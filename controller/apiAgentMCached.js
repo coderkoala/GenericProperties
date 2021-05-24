@@ -20,7 +20,9 @@ class leadController {
 
     if ("^invalid" === leadid) {
       res.status(400).json({
-        error: "Validation failed for the lead UUID.",
+        title: "Invalid Lead",
+        message: "Validation failed for the lead UUID.",
+        icon: "error",
       });
       return;
     }
@@ -33,12 +35,19 @@ class leadController {
     if (agentCachedResults) {
       const viewEngine = new view(agentCachedResults);
       let template = viewEngine.outputAgentsCollection();
-      res.json(template);
+      res.status(200).json({
+        title: "Success",
+        message: "Computed Agents data has been fetched.",
+        icon: "success",
+        data: template,
+      });
       return;
     } else {
       res.status(400).json({
-        error: "Session has expired.",
-        reason: "Computed data no longer available, please refresh the window and try again."
+        title: "Session has expired",
+        message: "Computed data no longer available, please refresh the window and try again.",
+        icon: "error",
+
       });
       return;
     }
