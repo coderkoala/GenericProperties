@@ -19,9 +19,9 @@ class AgentViewHelper {
               </td>
 
               <td>
-                <a href="{map_link}" target="_blank">{icon-map}</a>
-                <a class="view-single">{icon-eye}</a>
-                <a class="email-single">{icon-mail}</a>
+                <a href="{map_link}" target="_blank">{icon-map}</a>&nbsp;
+                &nbsp;<a class="clickable view-single">{icon-eye}</a>&nbsp;
+                &nbsp;<a class="clickable email-single">{icon-mail}</a>&nbsp;
               </td>
             </tr>`
       .replace(/\s{2,}/g, "")

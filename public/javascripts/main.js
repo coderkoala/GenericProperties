@@ -5,10 +5,8 @@
     defaultDistanceToRenderNearbyAgents: 5,
     fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
-    fetchRemoteAgentsCollectionsCachedAPIEndpoint:
-      "/api/v1/agents?id={leadid}",
-    fetchSingleAgentDataAPIEndpoint:
-      "/api/v1/agent?dynamics_id={id}",
+    fetchRemoteAgentsCollectionsCachedAPIEndpoint: "/api/v1/agents?id={leadid}",
+    fetchSingleAgentDataAPIEndpoint: "/api/v1/agent?dynamics_id={id}",
     fetchForwardGeocodedValuesEndpoint:
       "https://api.positionstack.com/v1/forward?callback=callback&access_key={access_key}&query={query}&limit=1",
     mapPinTableContentForAgents:
@@ -34,7 +32,7 @@
     initCurrentModalsInDOM: function () {
       // Trigger for opening agents modal.
       $("#triggerModalAgents").click(function () {
-        if ( glMSV.arrayAgentsCachedCollectionData ) {
+        if (glMSV.arrayAgentsCachedCollectionData) {
           $("#modalAgents").modal("show");
         } else {
           glMSV.fetchCachedAgentsCollectionFromRemote();
@@ -90,14 +88,35 @@
       // $("#tableau").removeClass("hidden"); For development.
       // $("#tableau").fadeIn("slow");
     },
-    renderMessageBoxSWAL: function (title, message, type = "success", callback = null) {
+    renderMessageBoxSWAL: function (
+      title,
+      message,
+      type = "success",
+      callback = null
+    ) {
       try {
         Swal.fire({
           title: title,
           icon: type,
           html: message,
         }).then(callback);
-      } catch(e){}
+      } catch (e) {}
+    },
+    renderPopOverSWALHTML: function (
+      title,
+      message,
+      type = null,
+      callback = null
+    ) {
+      try {
+        Swal.fire({
+          title: title,
+          html: message,
+          icon: type,
+          showCloseButton: true,
+          showConfirmButton: false,
+        }).then(callback);
+      } catch (e) {}
     },
     renderMapToDOM: function () {
       var mapElement = document.getElementById("map");
@@ -107,10 +126,12 @@
       glMSV.globalMapSelectorElement.attributionControl.setPrefix(
         '&copy; 2021 <a href="http://nobeldahal.com.np" target="_blank">Nobel Dahal</a>'
       );
-      libMap.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(glMSV.globalMapSelectorElement);
+      libMap
+        .tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        })
+        .addTo(glMSV.globalMapSelectorElement);
 
       // Target's GPS coordinates.
       var mapPinForIndividualAgent = libMap.latLng(
@@ -131,9 +152,10 @@
         "</a>";
 
       // Add marker.
-      libMap.marker(leadsPositionInMap, {
-        icon: glMSV.renderCustomMapPinsGenerator(),
-      })
+      libMap
+        .marker(leadsPositionInMap, {
+          icon: glMSV.renderCustomMapPinsGenerator(),
+        })
         .addTo(glMSV.globalMapSelectorElement)
         .bindPopup(subject, {
           closeOnClick: false,
@@ -162,9 +184,13 @@
     renderMapPinsforAgentsFromRemoteResult: function () {
       var localAgentDataStored = glMSV.agentarrayAgentsDataStored;
 
-      Object.keys(localAgentDataStored.data).forEach(function (stringCoordinatesLatitudeLongitude) {
-        var singleAgentTuple = localAgentDataStored.data[stringCoordinatesLatitudeLongitude];
-        var arrayCoordinatesLatitudeLongitude = stringCoordinatesLatitudeLongitude.split(",");
+      Object.keys(localAgentDataStored.data).forEach(function (
+        stringCoordinatesLatitudeLongitude
+      ) {
+        var singleAgentTuple =
+          localAgentDataStored.data[stringCoordinatesLatitudeLongitude];
+        var arrayCoordinatesLatitudeLongitude =
+          stringCoordinatesLatitudeLongitude.split(",");
 
         // Initiate Marker
         var agentsPositionInMap = libMap.latLng(
@@ -173,44 +199,57 @@
         );
 
         // Override icon from class instantiation.
-        libMap.marker(agentsPositionInMap, {
-          icon: glMSV.renderCustomMapPinsGenerator(
-            "/stylesheets/images/user.png",
-            [18, 25]
-          ),
-        })
+        libMap
+          .marker(agentsPositionInMap, {
+            icon: glMSV.renderCustomMapPinsGenerator(
+              "/stylesheets/images/user.png",
+              [18, 25]
+            ),
+          })
           .addTo(glMSV.globalMapSelectorElement)
-          .bindPopup(localAgentDataStored.template.replace("{0}", singleAgentTuple), {
-            closeOnClick: false,
-            autoClose: false,
-          });
+          .bindPopup(
+            localAgentDataStored.template.replace("{0}", singleAgentTuple),
+            {
+              closeOnClick: false,
+              autoClose: false,
+            }
+          );
       });
     },
     renderMapBeforeFetchingForwardGeocodedCoordinates: function () {
-      var firstElementinArrayGeocodedData = glMSV.arrayForwardGeocodedDataStored.data.pop();
-      glMSV.arrayLeadDataStored.new_latitude = firstElementinArrayGeocodedData.latitude;
-      glMSV.arrayLeadDataStored.new_longitude = firstElementinArrayGeocodedData.longitude;
+      var firstElementinArrayGeocodedData =
+        glMSV.arrayForwardGeocodedDataStored.data.pop();
+      glMSV.arrayLeadDataStored.new_latitude =
+        firstElementinArrayGeocodedData.latitude;
+      glMSV.arrayLeadDataStored.new_longitude =
+        firstElementinArrayGeocodedData.longitude;
 
       // Initiate recovery.
       glMSV.renderTableforMapPinContent();
       glMSV.renderMapToDOM();
       glMSV.fetchNearbyAgentsDatafromBackend();
     },
-    fetchCachedAgentsCollectionFromRemote: function(){
+    fetchCachedAgentsCollectionFromRemote: function () {
       glMSV.showLoadingScreenComponent();
       $.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
         datatype: "json",
-        url: glMSV.fetchRemoteAgentsCollectionsCachedAPIEndpoint.replace('{leadid}', glMSV.arrayLeadDataStored.leadid),
+        url: glMSV.fetchRemoteAgentsCollectionsCachedAPIEndpoint.replace(
+          "{leadid}",
+          glMSV.arrayLeadDataStored.leadid
+        ),
         success: function (arrayAgentsCachedCollectionData) {
-          glMSV.arrayAgentsCachedCollectionData = arrayAgentsCachedCollectionData;
+          glMSV.arrayAgentsCachedCollectionData =
+            arrayAgentsCachedCollectionData;
           glMSV.renderMessageBoxSWAL(
             arrayAgentsCachedCollectionData.title,
             arrayAgentsCachedCollectionData.message,
             arrayAgentsCachedCollectionData.icon,
-            function(){
-              $('#tableAgentsListView').empty().append(glMSV.arrayAgentsCachedCollectionData.data);
+            function () {
+              $("#tableAgentsListView")
+                .empty()
+                .append(glMSV.arrayAgentsCachedCollectionData.data);
               $("#modalAgents").modal("show");
             }
           );
@@ -221,7 +260,7 @@
           glMSV.renderMessageBoxSWAL(
             data.title || "Error",
             data.message || "Network Error occured. Please try again later.",
-            data.icon || "error",
+            data.icon || "error"
           );
         },
       });
@@ -275,7 +314,9 @@
           success: function (arrayLeadDataStored) {
             glMSV.agentarrayAgentsDataStored = arrayLeadDataStored;
             glMSV.hideLoadingScreenComponent();
-            var size = Object.keys(glMSV.agentarrayAgentsDataStored.data).length;
+            var size = Object.keys(
+              glMSV.agentarrayAgentsDataStored.data
+            ).length;
             if (size) {
               glMSV.renderMessageBoxSWAL(
                 "Agents Found",
@@ -398,7 +439,11 @@
       var $type = $selectedElement.attr("validation");
       switch ($type) {
         case "location":
-          if ($selectedElement.val().match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)) {
+          if (
+            $selectedElement
+              .val()
+              .match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)
+          ) {
             $selectedElement.addClass("is-invalid");
           }
           break;

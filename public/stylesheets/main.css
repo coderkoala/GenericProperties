@@ -91,7 +91,7 @@ main.container {
 }
 
 #tableAgentsListView {
-  max-height: 10rem;
+  max-height: 25rem;
   overflow: auto;
 }
 
@@ -107,4 +107,8 @@ main.container {
 
 .leaflet-zoom-anim .leaflet-zoom-animated {
   will-change: auto !important;
+}
+
+.clickable{
+  cursor: pointer;
 }
