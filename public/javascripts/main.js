@@ -1,6 +1,8 @@
 (function ($, libMap) {
   "use strict";
   var glMSV = {
+    subject: "Lead Referral Near You",
+    emailAgentsAPIEndpoint: "/api/v1/email",
     currentPageRouteEndpoint: "/geolocation",
     defaultDistanceToRenderNearbyAgents: 5,
     fetchRemoteAgentsAPIEndpoint:
@@ -36,6 +38,21 @@
           $("#modalAgents").modal("show");
         } else {
           glMSV.fetchCachedAgentsCollectionFromRemote();
+        }
+      });
+
+      // Trigger for opening subject changer for email.
+      $('#subject').val(glMSV.subject).change();
+      $("#changeEmailSubject").click(function () {
+        $('#subject').val(glMSV.subject).change();
+        $('#changeSubject').modal('show');
+      });
+
+      // Save to email subject.
+      $("#saveSubject").click(function () {
+        if ( ! $('#subject').hasClass('is-invalid') ) {
+          glMSV.subject = $('#subject').val();
+          $('#changeSubject').modal('hide');
         }
       });
 
@@ -198,7 +215,9 @@
 
       // Don't let another iteration proceed.
       $("#btnSubmit").remove();
-      $("#triggerModalAgents").removeClass("hidden");
+      $(".post-flight").removeClass("hidden");
+      // $("#changeEmailSubject").removeClass("hidden");
+      // $("#triggerModalAgents").removeClass("hidden");
       $("#location").attr("disabled", "disabled").addClass("disabled");
     },
     renderCustomMapPinsGenerator: function (
@@ -276,15 +295,7 @@
         success: function (arrayAgentsCachedCollectionData) {
           glMSV.arrayAgentsCachedCollectionData =
             arrayAgentsCachedCollectionData;
-          $("#tableAgentsListView")
-            .empty()
-            .append(glMSV.arrayAgentsCachedCollectionData.data);
-          $(".view-single")
-            .off()
-            .on("click", glMSV.renderCurrentlySelectedAgentAsModal);
-          $("#sendEmailAgents")
-            .off()
-            .on("click", glMSV.fetchCheckedBoxesForEmailingAgents);
+          glMSV.manageAllCachedAgentsEvents();
           $("#modalAgents").modal("show");
           glMSV.hideLoadingScreenComponent();
         },
@@ -292,7 +303,8 @@
           glMSV.hideLoadingScreenComponent();
           glMSV.renderMessageBoxSWAL(
             data.title || "Session has expired",
-            data.message || "Computed data no longer available, please refresh the window and try again.",
+            data.message ||
+              "Computed data no longer available, please refresh the window and try again.",
             data.icon || "error"
           );
         },
@@ -469,7 +481,7 @@
     fetchCheckedBoxesForEmailingAgents: function () {
       var data = [];
 
-      $(".agent-selector").each( function(i, tuple) {
+      $(".agent-selector").each(function (i, tuple) {
         if ($(tuple).is(":checked")) {
           data.push($(tuple).data("check"));
         }
@@ -477,17 +489,24 @@
 
       if (!data.length) {
         glMSV.renderMessageBoxSWAL(
-          'Invalid Selection',
-          'No Agents selected. Please select agents via the checkbox button.',
-          'error'
+          "Invalid Selection",
+          "No Agents selected. Please select agents via the checkbox button.",
+          "error"
         );
       } else {
         glMSV.pushAgentsIDToServerForEmailing(data);
       }
     },
-    pushAgentsIDToServerForEmailing: function(data){
+    pushAgentsIDToServerForEmailing: function (data) {
       var leadIDToSend = glMSV.arrayLeadDataStored.leadid;
-      console.log( data, leadIDToSend );
+      glMSV.sendEmail(data, leadIDToSend);
+    },
+    pushSingleAgentIDToServerForEmailing: function (e) {
+      var leadIDToSend = glMSV.arrayLeadDataStored.leadid;
+      var email = [
+        $(this).closest("tr").children().find(".agent-selector").data("check"),
+      ];
+      glMSV.sendEmail([email], leadIDToSend);
     },
     validateInputBoxValue: function (ele) {
       var $selectedElement = $(ele);
@@ -495,6 +514,15 @@
       var $type = $selectedElement.attr("validation");
       switch ($type) {
         case "location":
+          if (
+            $selectedElement
+              .val()
+              .match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)
+          ) {
+            $selectedElement.addClass("is-invalid");
+          }
+          break;
+        case "subject":
           if (
             $selectedElement
               .val()
@@ -511,6 +539,37 @@
           }
           break;
       }
+    },
+    sendEmail: (emailDataArray, leadIDToSend = null) => {
+      glMSV.showLoadingScreenComponent();
+      $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: glMSV.emailAgentsAPIEndpoint,
+        data: JSON.stringify({
+          to: emailDataArray,
+          id: leadIDToSend || glMSV.arrayLeadDataStored.leadid || null,
+          subject: glMSV.subject,
+        }),
+        success: function (data) {
+          glMSV.renderMessageBoxSWAL(
+            data.title || "Successfully Dispatched",
+            data.message ||
+              "An autogenerated email for the selected agent/s have been dispatched.",
+            data.icon || "success"
+          );
+          glMSV.hideLoadingScreenComponent();
+        },
+        error: function (data) {
+          glMSV.hideLoadingScreenComponent();
+          glMSV.renderMessageBoxSWAL(
+            data.title || "Email couldn't be sent.",
+            data.message ||
+              "Dispatching of email failed due to mail server issues. Please try again later.",
+            data.icon || "error"
+          );
+        },
+      });
     },
     sanitizeInputBoxValue: function (ele) {
       var $selectedElementToSanitize = $(ele);
@@ -552,6 +611,20 @@
       return str.match(
         /&id=\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
       );
+    },
+    manageAllCachedAgentsEvents: function () {
+      $("#tableAgentsListView")
+        .empty()
+        .append(glMSV.arrayAgentsCachedCollectionData.data);
+      $(".view-single")
+        .off()
+        .on("click", glMSV.renderCurrentlySelectedAgentAsModal);
+      $("#sendEmailAgents")
+        .off()
+        .on("click", glMSV.fetchCheckedBoxesForEmailingAgents);
+      $(".email-single")
+        .off()
+        .on("click", glMSV.pushSingleAgentIDToServerForEmailing);
     },
   };
 

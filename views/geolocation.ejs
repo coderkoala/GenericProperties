@@ -20,8 +20,14 @@
               Find Nearby Agents
             </button>
             <button
+              id="changeEmailSubject"
+              class="input-group-text post-flight btn btn-outline-info hidden"
+            >
+              Change Subject
+            </button>
+            <button
               id="triggerModalAgents"
-              class="input-group-text btn-outline-secondary hidden"
+              class="input-group-text post-flight btn-outline-secondary hidden"
             >
               List View
             </button>
@@ -47,32 +53,54 @@
 
 <!-- Agents List Modal -->
 <div
-  class="modal fade"
-  id="modalAgents"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="modalAgentsLabel"
+class="modal fade"
+id="modalAgents"
+tabindex="-1"
+role="dialog"
+aria-labelledby="modalAgentsLabel"
 >
-  <div class="modal-dialog draggable-ui" role="document">
+<div class="modal-dialog draggable-ui" role="document">
+  <div class="modal-content">
+    <div class="modal-header no-border">
+      <button
+      type="button"
+      class="btn-close dismissModal"
+      aria-label="Close"
+      ></button>
+    </div>
+    <input
+    id="search"
+    validation="search"
+    type="text"
+    class="form-control disabled"
+    placeholder="Begin Typing to filter agents"
+    aria-label="search"
+    aria-describedby="basic-addon2"
+    />
+    <div class="modal-body">
+      <div id="tableAgentsListView"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Change subject modal -->
+<div class="modal fade" id="changeSubject" tabindex="-1" aria-labelledby="changeSubjectLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header no-border">
-        <button
-          type="button"
-          class="btn-close dismissModal"
-          aria-label="Close"
-        ></button>
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeSubjectLabel">Change email subject for automated emailing.</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <input
-        id="search"
-        validation="search"
-        type="text"
-        class="form-control disabled"
-        placeholder="Begin Typing to filter agents"
-        aria-label="search"
-        aria-describedby="basic-addon2"
-      />
       <div class="modal-body">
-        <div id="tableAgentsListView"></div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">Email Subject</span>
+          <input id="subject" validation="subject" type="text" class="form-control" aria-label="Subject for email">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="saveSubject" type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
