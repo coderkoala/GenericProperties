@@ -60,7 +60,7 @@ class AgentViewHelper {
     // Used ES6 templating for readability.
     return `<tr data-id="{id}">
               <td>
-                  <input class="form-check-input agent-selector" type="checkbox" value="">
+                  <input data-check="{id}" class="form-check-input agent-selector" type="checkbox" value="">
               </td>
               
               <td>
@@ -117,7 +117,7 @@ class AgentViewHelper {
 
   reducerAgentsCollection(singleTuple) {
     return this.getRowTemplate()
-      .replace("{id}", singleTuple.id)
+      .replace(/{id}/g, singleTuple.id)
       .replace(/{name}/g, singleTuple.name)
       .replace("{hotlink}", singleTuple.url)
       .replace(
