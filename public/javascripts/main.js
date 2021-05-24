@@ -509,7 +509,9 @@
           return $(this).data("value");
         })
         .get();
-      var result = filteredResults.filter((el) => el.includes(query));
+      var result = filteredResults.filter(function (el) {
+        return el.includes(query);
+      });
       glMSV.showOnlyViableAgentRows(result);
     },
     showOnlyViableAgentRows: function (filteredResults) {
