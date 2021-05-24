@@ -6,6 +6,55 @@ class AgentViewHelper {
     this.params = params;
   }
 
+  getSingleTupleTemplate() {
+    return `<table style="margin:1rem;width: 50%;text-align: left">
+              <tbody>
+                <tr>
+                  <td style="background:#f1f1f1;padding:10px">Full Name</td>
+                  <td><b> &nbsp;&nbsp;{cr4f2_fullname}</b></td>
+                </tr>
+                <tr>
+                  <td style="background:#f1f1f1;padding:10px">Email address</td>
+                  <td><b> &nbsp;&nbsp;{new_email}</b></td>
+                </tr>
+                <tr>
+                  <td style="background:#f1f1f1;padding:10px">Phone Number</td>
+                  <td><b> &nbsp;&nbsp;{new_phone}</b></td>
+                </tr>
+                    <tr>
+                  <td style="background:#f1f1f1;padding:10px">Company Name</td>
+                  <td><b> &nbsp;&nbsp;{new_companyname}</b></td>
+                </tr>
+                    <tr>
+                  <td style="background:#f1f1f1;padding:10px">Address</td>
+                  <td><b> &nbsp;&nbsp;{new_address}</b></td>
+                </tr>
+                    <tr>
+                  <td style="background:#f1f1f1;padding:10px">City</td>
+                  <td><b> &nbsp;&nbsp;{new_city}</b></td>
+                </tr>
+                <tr>
+                  <td style="background:#f1f1f1;padding:10px">Zip Code</td>
+                  <td style=""><b> &nbsp;&nbsp;{new_zipcode}</b></td>
+                </tr>
+              </tbody>
+            </table>`
+      .replace(/\s{2,}/g, "")
+      .trim();
+  }
+
+  
+  outputSingleAgent(agentTuple) {
+    return this.getSingleTupleTemplate()
+      .replace("{cr4f2_fullname}", agentTuple.cr4f2_fullname || "(empty)")
+      .replace("{new_email}", agentTuple.new_email || "(empty)")
+      .replace("{new_phone}", agentTuple.new_phone || "(empty)")
+      .replace("{new_companyname}", agentTuple.new_companyname || "(empty)")
+      .replace("{new_address}", agentTuple.new_address || "(empty)")
+      .replace("{new_city}", agentTuple.new_city || "(empty)")
+      .replace("{new_zipcode}", agentTuple.new_zipcode || "(empty)");
+  }
+
   getRowTemplate() {
     // Returns trimmed template by regex.
     // Used ES6 templating for readability.
@@ -15,7 +64,7 @@ class AgentViewHelper {
               </td>
               
               <td>
-                <a href="{hotlink}" target="_blank">{name}</a>
+                <a class="agentSingle" data-value="{name}" href="{hotlink}" target="_blank">{name}</a>
               </td>
 
               <td>
@@ -69,7 +118,7 @@ class AgentViewHelper {
   reducerAgentsCollection(singleTuple) {
     return this.getRowTemplate()
       .replace("{id}", singleTuple.id)
-      .replace("{name}", singleTuple.name)
+      .replace(/{name}/g, singleTuple.name)
       .replace("{hotlink}", singleTuple.url)
       .replace(
         "{map_link}",
