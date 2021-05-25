@@ -1,6 +1,6 @@
-# MSVProperties Dynamics CRM v1.03
+# Generic Dynamics CRM v1.03
 
-Customizations targetted for MSVProperties LLC by @coderkoala
+Customizations targetted for Generic LLC by @coderkoala
 
 # MSVProperties CRM Extended Models for specific requirement fulfillment.
 
