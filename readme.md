@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 # GenRe Microservices v1.03
 
 A nodeJS(ExpressJS) microservice server that helps geolocate nearby agents, and send bulk email requests to them. Written and maintained by [@coderkoala](https://github.com/coderkoala)
 
 # Generic Realstate Agency Microservice
-=======
-# Generic Dynamics CRM v1.03
-
-Customizations targetted for Generic LLC by @coderkoala
-
-# Generic CRM Extended Models for specific requirement fulfillment.
->>>>>>> 8371a33ffb8bd43a8df98159cf3a18a95c77a34d
 
 ##### Server ochestration
 
