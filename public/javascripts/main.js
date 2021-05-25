@@ -175,12 +175,12 @@
       glMSV.globalMapSelectorElement = libMap.map(mapElement);
 
       glMSV.globalMapSelectorElement.attributionControl.setPrefix(
-        '&copy; 2021 <a href="http://nobeldahal.com.np" target="_blank">Nobel Dahal</a>'
+        '&copy; 2021 <a href="https://nobeldahal.com.np" target="_blank">Nobel Dahal</a>'
       );
       libMap
-        .tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+        .tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
           attribution:
-            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
         })
         .addTo(glMSV.globalMapSelectorElement);
 
