@@ -26,20 +26,46 @@ class Mailer {
     });
   }
 
-  prepareMail(param) {
+  prepareMail( from, to, subject, recipient = '' ) {
     let email = new template();
-    return {
-      from: param.from || process.env.email_username,
-      to: param.to.pop(),
-      bcc: param.to,
-      subject: param.subject,
-      html: email.getEmailBasic(),
+    return {        
+      from: from || process.env.email_username,
+      to: to,
+      subject: subject,
+      html: email.getEmailBasic().replace('{name}', ` ${recipient}`),
     };
   }
 
   async sendMail(req, res) {
-    let mailTransporter = await this.getTransporter();
-    mailTransporter.sendMail(this.prepareMail(req), this.handleEmailResponse);
+    let error = 'success';
+    let response = {}; 
+    if ( req.to.length < 1 ) {
+      error = 'error';
+      response = {
+        title: 'Invalid Receiver',
+        message: 'The receipient received invalid. Please try again with a valid receiver.',
+        error: 'error'
+      };
+    } else if( req.subject.match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i) ) {
+      error = 'error';
+      response = {
+        title: 'Invalid Subject',
+        message: 'The subject you tried assigning to emails are invalid. Please try putting a valid email.',
+        error: 'error'
+      };
+    }
+
+    req.names = req.names === undefined ? [] : req.names.length ? req.names : []; 
+
+    if ( 'error' === error ) {
+      res.status(400).json(response);
+    } else {
+      let mailTransporter = await this.getTransporter();
+      req.to.forEach( ( singleEmail, arrayIndex ) => {
+        const params = this.prepareMail( null, singleEmail, req.subject, req.names[arrayIndex] );
+        mailTransporter.sendMail( params, this.handleEmailResponse);
+      });
+    }
 
   }
 }

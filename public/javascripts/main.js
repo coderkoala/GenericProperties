@@ -42,17 +42,17 @@
       });
 
       // Trigger for opening subject changer for email.
-      $('#subject').val(glMSV.subject).change();
+      $("#subject").val(glMSV.subject).change();
       $("#changeEmailSubject").click(function () {
-        $('#subject').val(glMSV.subject).change();
-        $('#changeSubject').modal('show');
+        $("#subject").val(glMSV.subject).change();
+        $("#changeSubject").modal("show");
       });
 
       // Save to email subject.
       $("#saveSubject").click(function () {
-        if ( ! $('#subject').hasClass('is-invalid') ) {
-          glMSV.subject = $('#subject').val();
-          $('#changeSubject').modal('hide');
+        if (!$("#subject").hasClass("is-invalid")) {
+          glMSV.subject = $("#subject").val();
+          $("#changeSubject").modal("hide");
         }
       });
 
@@ -480,10 +480,14 @@
     },
     fetchCheckedBoxesForEmailingAgents: function () {
       var data = [];
+      var names = [];
 
       $(".agent-selector").each(function (i, tuple) {
         if ($(tuple).is(":checked")) {
           data.push($(tuple).data("check"));
+          names.push(
+            $(tuple).closest("tr").children().find(".agentSingle").data("value")
+          );
         }
       });
 
@@ -494,19 +498,20 @@
           "error"
         );
       } else {
-        glMSV.pushAgentsIDToServerForEmailing(data);
+        glMSV.pushAgentsIDToServerForEmailing(data, names);
       }
     },
-    pushAgentsIDToServerForEmailing: function (data) {
-      var leadIDToSend = glMSV.arrayLeadDataStored.leadid;
-      glMSV.sendEmail(data, leadIDToSend);
+    pushAgentsIDToServerForEmailing: function (data, names) {
+      glMSV.sendEmail(data, names);
     },
     pushSingleAgentIDToServerForEmailing: function (e) {
-      var leadIDToSend = glMSV.arrayLeadDataStored.leadid;
       var email = [
         $(this).closest("tr").children().find(".agent-selector").data("check"),
       ];
-      glMSV.sendEmail([email], leadIDToSend);
+      var name = [
+        $(this).closest("tr").children().find(".agentSingle").data("value"),
+      ];
+      glMSV.sendEmail([email], [name]);
     },
     validateInputBoxValue: function (ele) {
       var $selectedElement = $(ele);
@@ -540,7 +545,7 @@
           break;
       }
     },
-    sendEmail: (emailDataArray, leadIDToSend = null) => {
+    sendEmail: (emailDataArray, emailRecipients = []) => {
       glMSV.showLoadingScreenComponent();
       $.ajax({
         type: "POST",
@@ -548,7 +553,7 @@
         url: glMSV.emailAgentsAPIEndpoint,
         data: JSON.stringify({
           to: emailDataArray,
-          id: leadIDToSend || glMSV.arrayLeadDataStored.leadid || null,
+          names: emailRecipients,
           subject: glMSV.subject,
         }),
         success: function (data) {
