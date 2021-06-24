@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "nodemon": "nodemon --ignore logs",
-    "import": "node ./01-data-import.js"
+    "import": "node ./01-data-import.js",
+    "migrate": "node ./data-migration.js"
   },
   "dependencies": {
     "adal-node": "^0.2.2",
