@@ -7,10 +7,7 @@ let DynamicsCrmRest = require("./src/dynamics");
 
 class homeController {
   async view(req, res, next) {
-    let crm = new DynamicsCrmRest();
-    await crm.get("leads?$top=3").then((result) => {
-      res.render("index", { title: "View!" });
-    });
+    res.render("index", { title: "Agents Geolocation Service" });
   }
 
   async post(req, res) {

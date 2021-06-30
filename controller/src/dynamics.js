@@ -1,11 +1,11 @@
 "use strict";
 require('dotenv').config();
+const cacheClass = require("persistent-cache");
 const axios = require("axios");
 const AuthenticationContext = require("adal-node").AuthenticationContext;
 
 class DynamicsCrmRest {
   constructor() {
-    
     this.params = {
       orgName: process.env.dynamics_orgName,
       orgDomain: process.env.dynamics_orgDomain,
@@ -43,7 +43,14 @@ class DynamicsCrmRest {
   }
 
   get(endPoint) {
+    let cache = cacheClass({
+      base: "logs",
+      name: "cacheDB",
+      duration: 3600000,
+    });
+
     return this.auth(this.params).then(function (result) {
+      // cache.putSync('aadl_token', { bearer: result.token });
       const instance = axios.create({
         baseURL: `https://${result.org}.api.crm.dynamics.com/api/data/v9.0/${endPoint}`,
         timeout: 0,

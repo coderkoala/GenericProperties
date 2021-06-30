@@ -102,7 +102,7 @@
           glMSV.hideLoadingScreenComponent();
           glMSV.renderPopOverSWALHTML(
             data.title || "Error",
-            data.message || "Network Error occured. Please try again later.",
+            data.message || "The agent record couldn't be found in your Dynamics 365 Database.",
             data.icon || "error"
           );
         },
