@@ -4,20 +4,23 @@
     "password": null,
     "database": "msvproperties",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "define": { "charset": "utf8", "collate": "utf8_general_ci" }
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "testDB",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "define": { "charset": "utf8", "collate": "utf8_general_ci" }
   },
   "production": {
     "username": "msvproperties",
     "password": "msvproperties",
     "database": "msvproperties",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "define": { "charset": "utf8", "collate": "utf8_general_ci" }
   }
 }

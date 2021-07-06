@@ -171,7 +171,6 @@ class dynamicsMigration {
   }
 
   quitOnSuccess() {
-    // Todo, close log, do cleanup, and exit gracefully.
     this.logger.log({
       level: "info",
       message: `[SUCCESS] Imported data successfully. Please check migrations log for more information.`,
