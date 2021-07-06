@@ -105,10 +105,10 @@ class dynamicsMigration {
     return delete this.mappedData;
   }
 
-  async init() {
+  async init(param) {
     try {
       // Declarations for the migration start.
-      await this.fetchData();
+      await this.fetchData(param);
 
       // Actual migration happens here.
       try {
@@ -142,6 +142,7 @@ class dynamicsMigration {
       // Failure in fetching, bail quickly.
       this.quitOnException(e);
     }
+    await this.finalizeMigration();
   }
 
   async processNextLink() {
@@ -158,16 +159,44 @@ class dynamicsMigration {
     }
   }
 
+  // Recomputes all the geolocation into
+  // the point form used in Harvesine formula.
+  async finalizeMigration() {
+    console.log(`\x1b[34m[PRUNING] Pruning database, please wait.\x1b[0m`);
+    await db.sequelize.query(
+      `DELETE FROM 
+      geolocation 
+      WHERE 
+      latitude=NULL 
+      OR latitude='' 
+      OR 
+      longitude='' 
+      OR longitude=NULL`
+    );
+    console.log(
+      `\x1b[34m[FINALIZING] Recomputing all point vectors for geolocation, this might take a while.\x1b[0m`
+    );
+    await db.sequelize.query(
+      `UPDATE 
+      geolocation 
+      SET coordinates=POINT(longitude,latitude);`
+    );
+  }
+
   quitOnException(e = "") {
     let message =
       "" === e
         ? `\x1b[31m[SIGTERM] Reason: Migration failed. Unknown Exception occured.\x1b[0m`
         : `\x1b[31m[SIGTERM] Reason: Migration failed. You can check the logs generated on : migrations.log\x1b[0m\n\nException: ${e}`;
-        this.logger.log({
-          level: "error",
-          message: `[ERROR] Import failed due to exception resulting in SIGTERM: ${e}`,
-        });
-        console.log(message);
+    this.logger.log({
+      level: "error",
+      message: `[ERROR] Import failed due to exception resulting in SIGTERM: ${e}`,
+    });
+    this.logger.log({
+      level: "error",
+      message: `[Failed at] : ${this.dataNextLink}`,
+    });
+    console.log(message);
   }
 
   quitOnSuccess() {
@@ -182,4 +211,4 @@ class dynamicsMigration {
 }
 
 let runMigrations = new dynamicsMigration();
-runMigrations.init();
+runMigrations.init(process.argv.slice(2).pop() || "cr4f2_agentsandrealtors");
