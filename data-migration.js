@@ -5,15 +5,13 @@ require("dotenv").config();
 
 // Begin importing the dependencies.
 const db = require("./models").Geolocation;
-var fs = require("fs");
-var csv = require("csv-parser");
 const winston = require("winston");
 const dynamics = require("./controller/src/dynamics");
 
 class dynamicsMigration {
   constructor() {
     this.mappedData = {}; // Data container for fetching and processing data.
-    this.dataNextLink = ''; // The next link for recursive API calls(For the next 5000 dataset batch).
+    this.dataNextLink = ""; // The next link for recursive API calls(For the next 5000 dataset batch).
 
     // Log info so we know what rows failed imports.
     this.logger = winston.createLogger({
@@ -62,10 +60,28 @@ class dynamicsMigration {
   }
 
   async processData(data = undefined) {
-    let localDataTuple = data || this.mappedData.data.value;
-    console.log(typeof localDataTuple);
+    let dataToInsert = [];
+    let localDataTuple = data || this.mappedData.data.value || [];
+    localDataTuple.forEach((dataTuple) => {
+      dataToInsert.push({
+        id: dataTuple.cr4f2_agentsandrealtorid,
+        name: dataTuple.cr4f2_fullname,
+        email: dataTuple.new_email,
+        phone: dataTuple.new_phone,
+        company: dataTuple.new_companyname,
+        address: dataTuple.new_address,
+        latitude: dataTuple.new_latitude,
+        longitude: dataTuple.new_longitude,
+        createdAt: dataTuple.createdon,
+        updatedAt: dataTuple.modifiedon,
+      });
+    });
+
+    // Insert the data in batch
+    console.dir(dataToInsert[0]);
+
     // Todo: Begin dataprocessing, opening and closing DB transaction here.
-    // console.dir(localDataTuple[0]);
+    delete this.mappedData;
   }
 
   async init() {
@@ -75,16 +91,18 @@ class dynamicsMigration {
 
       // Actual migration happens here.
       try {
-        if( 'undefined' !== typeof this.mappedData.data && 'undefined' !== typeof this.mappedData.data['@odata.context'] ) {
-          this.dataNextLink = this.mappedData.data['@odata.nextLink'] || ''; // Todo: Regex out the endpoint with cookie params.
+        if (
+          "undefined" !== typeof this.mappedData.data &&
+          "undefined" !== typeof this.mappedData.data["@odata.context"]
+        ) {
+          this.dataNextLink = this.mappedData.data["@odata.nextLink"] || ""; // Todo: Regex out the endpoint with cookie params.
           this.processData();
         } else {
-          throw 'The server couldn\'t be reached for polling data.';
+          throw "The server couldn't be reached for polling data.";
         }
-      } catch(e){
-        throw 'Server error, the given dataset couldn\'t be resolved.';
+      } catch (e) {
+        throw "Server error, the given dataset couldn't be resolved.";
       }
-      
     } catch (e) {
       // Failure in fetching, bail quickly.
       this.quitOnException(e);
@@ -92,7 +110,7 @@ class dynamicsMigration {
   }
 
   quitOnException(e = "") {
-    // Todo: Reverse the action of migration. 
+    // Todo: Reverse the action of migration.
     // Todo: Rollback the transaction if it fails mid-flight.
     // Todo: log what exactly caused the failure, then dispatch an email to author informing.
     let message =

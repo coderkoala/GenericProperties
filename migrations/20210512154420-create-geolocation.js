@@ -18,6 +18,14 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING(160),
       },
+      company: {
+        allowNull: true,
+        type: Sequelize.STRING(160),
+      },
+      phone: {
+        allowNull: true,
+        type: Sequelize.STRING(160),
+      },
       latitude: {
         allowNull: true,
         type: Sequelize.STRING(32),
