@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       address: DataTypes.STRING,
       email: DataTypes.STRING,
+      company: DataTypes.STRING,
+      phone: DataTypes.STRING,
       latitude: DataTypes.STRING,
       longitude: DataTypes.STRING,
       coordinates: DataTypes.GEOMETRY("POINT", 4326),

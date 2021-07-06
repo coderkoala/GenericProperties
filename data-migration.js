@@ -10,6 +10,7 @@ const dynamics = require("./controller/src/dynamics");
 
 class dynamicsMigration {
   constructor() {
+    this.count = 1;
     this.mappedData = {}; // Data container for fetching and processing data.
     this.dataNextLink = ""; // The next link for recursive API calls(For the next 5000 dataset batch).
 
@@ -77,11 +78,31 @@ class dynamicsMigration {
       });
     });
 
-    // Insert the data in batch
-    console.dir(dataToInsert[0]);
+    // Let sequelize handle duplicates, bulk create the fresh ones.
+    await db.bulkCreate(dataToInsert, {
+      fields: [
+        "id",
+        "name",
+        "email",
+        "phone",
+        "company",
+        "address",
+        "latitude",
+        "longitude",
+        "createdAt",
+        "updatedAt",
+      ],
+      updateOnDuplicate: ["id"],
+    });
 
-    // Todo: Begin dataprocessing, opening and closing DB transaction here.
-    delete this.mappedData;
+    console.log(
+      `\x1b[34m[IMPORT] Importing ${
+        this.count * dataToInsert.length
+      } records.\x1b[0m`
+    );
+
+    // Free memory.
+    return delete this.mappedData;
   }
 
   async init() {
@@ -95,13 +116,27 @@ class dynamicsMigration {
           "undefined" !== typeof this.mappedData.data &&
           "undefined" !== typeof this.mappedData.data["@odata.context"]
         ) {
-          this.dataNextLink = this.mappedData.data["@odata.nextLink"] || ""; // Todo: Regex out the endpoint with cookie params.
-          this.processData();
+          do {
+            try {
+              this.dataNextLink = this.mappedData.data["@odata.nextLink"];
+            } catch (e) {
+              this.dataNextLink = false;
+            }
+            await this.processData();
+            await this.processNextLink(this.dataNextLink);
+            if (false !== this.dataNextLink) {
+              console.log(
+                `\x1b[34m[FETCH] Importing data from endpoint: cr4f2_agentsandrealtors for another 5000 records.\x1b[0m`
+              );
+              await this.fetchData(this.dataNextLink);
+            }
+          } while (false !== this.dataNextLink);
+          this.quitOnSuccess();
         } else {
           throw "The server couldn't be reached for polling data.";
         }
       } catch (e) {
-        throw "Server error, the given dataset couldn't be resolved.";
+        throw e;
       }
     } catch (e) {
       // Failure in fetching, bail quickly.
@@ -109,21 +144,40 @@ class dynamicsMigration {
     }
   }
 
+  async processNextLink() {
+    try {
+      if (this.dataNextLink.match(/cr4f2_agentsandrealtors.*/gi).length) {
+        this.dataNextLink = this.dataNextLink.match(
+          /cr4f2_agentsandrealtors.*/gi
+        )[0]; // Cherry-pick the endpoint only.
+      } else {
+        this.dataNextLink = false;
+      }
+    } catch (e) {
+      this.dataNextLink = false;
+    }
+  }
+
   quitOnException(e = "") {
-    // Todo: Reverse the action of migration.
-    // Todo: Rollback the transaction if it fails mid-flight.
-    // Todo: log what exactly caused the failure, then dispatch an email to author informing.
     let message =
       "" === e
         ? `\x1b[31m[SIGTERM] Reason: Migration failed. Unknown Exception occured.\x1b[0m`
         : `\x1b[31m[SIGTERM] Reason: Migration failed. You can check the logs generated on : migrations.log\x1b[0m\n\nException: ${e}`;
-    console.log(message);
+        this.logger.log({
+          level: "error",
+          message: `[ERROR] Import failed due to exception resulting in SIGTERM: ${e}`,
+        });
+        console.log(message);
   }
 
   quitOnSuccess() {
     // Todo, close log, do cleanup, and exit gracefully.
+    this.logger.log({
+      level: "info",
+      message: `[SUCCESS] Imported data successfully. Please check migrations log for more information.`,
+    });
     console.log(
-      `\x1b[32m[SUCCESS] Migrations were successful. Restarting service. Logs generated on : migrations.log\x1b[0m`
+      `\x1b[32m[SUCCESS] Migrations were successful. Logs generated on : migrations.log\x1b[0m`
     );
   }
 }
