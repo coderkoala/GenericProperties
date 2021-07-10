@@ -79,21 +79,29 @@ class dynamicsMigration {
     });
 
     // Let sequelize handle duplicates, bulk create the fresh ones.
-    await db.bulkCreate(dataToInsert, {
-      fields: [
-        "id",
-        "name",
-        "email",
-        "phone",
-        "company",
-        "address",
-        "latitude",
-        "longitude",
-        "createdAt",
-        "updatedAt",
-      ],
-      updateOnDuplicate: ["id"],
-    });
+    try {
+      await db.bulkCreate(dataToInsert, {
+        fields: [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "company",
+          "address",
+          "latitude",
+          "longitude",
+          "createdAt",
+          "updatedAt",
+        ],
+        updateOnDuplicate: ["id"],
+      });
+    } catch(e) {
+      this.logger.log({
+        level: "error",
+        message: `[ERROR] Pull failed on: ${this.dataNextLink}`,
+      });
+    }
+
 
     console.log(
       `\x1b[34m[IMPORT] Importing ${

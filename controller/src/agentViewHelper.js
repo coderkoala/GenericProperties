@@ -43,7 +43,6 @@ class AgentViewHelper {
       .trim();
   }
 
-  
   outputSingleAgent(agentTuple) {
     return this.getSingleTupleTemplate()
       .replace("{cr4f2_fullname}", agentTuple.cr4f2_fullname || "(empty)")
@@ -62,11 +61,15 @@ class AgentViewHelper {
               <td>
                   <input data-check="{email}" class="form-check-input agent-selector" type="checkbox" value="">
               </td>
-              
               <td>
                 <a class="agentSingle" data-value="{name}" href="{hotlink}" target="_blank">{name}</a>
+              </td> 
+              <td>
+                {company}
               </td>
-
+              <td>
+                <a href="tel:{phone}" target="_blank">{phone}</a>
+              </td>
               <td>
                 <a href="{map_link}" target="_blank">{icon-map}</a>&nbsp;
                 &nbsp;<a class="clickable view-single">{icon-eye}</a>&nbsp;
@@ -81,7 +84,9 @@ class AgentViewHelper {
     return `<thead>
               <tr>
                 <th></th>
-                <th>Agent</th>
+                <th>Agent Name</th>
+                <th>Company Name</th>
+                <th>Phone Number</th>
                 <th><button id="sendEmailAgents" class="btn btn-outline-dark">Send Bulk mail</button></th>
               </tr>
             </thead>`
@@ -121,6 +126,9 @@ class AgentViewHelper {
       .replace(/{name}/g, singleTuple.name)
       .replace("{email}", singleTuple.email)
       .replace("{hotlink}", singleTuple.url)
+      .replace("{phone}", singleTuple.phone)
+      .replace("{phone}", singleTuple.phone)
+      .replace("{company}", singleTuple.company)
       .replace(
         "{map_link}",
         `https://maps.google.com/maps?q=${singleTuple.latitude},${singleTuple.longitude}`

@@ -39,11 +39,11 @@ class Mailer {
   async sendMail(req, res) {
     let error = 'success';
     let response = {}; 
-    if ( req.to.length < 1 ) {
+    if ( undefined === typeof req.to.length || req.to.length < 1 ) {
       error = 'error';
       response = {
         title: 'Invalid Receiver',
-        message: 'The receipient received invalid. Please try again with a valid receiver.',
+        message: 'The recipient received invalid. Please try again with a valid receiver.',
         error: 'error'
       };
     } else if( req.subject.match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i) ) {
@@ -58,7 +58,7 @@ class Mailer {
     req.names = req.names === undefined ? [] : req.names.length ? req.names : []; 
 
     if ( 'error' === error ) {
-      res.status(400).json(response);
+      return res.status(400).json(response);
     } else {
       let mailTransporter = await this.getTransporter();
       req.to.forEach( ( singleEmail, arrayIndex ) => {

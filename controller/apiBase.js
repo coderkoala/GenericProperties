@@ -62,6 +62,8 @@ class homeController {
       let sqlQuery = `
       SELECT 
       id, name, address, email, CONCAT('${hotLink}',geolocation.id) as url,
+      phone as phone,
+      company as company,
       ST_Y(coordinates) AS latitude,
       ST_X(coordinates) AS longitude,
       (6371 * ACOS(COS(RADIANS(${coordinates.latitude})) * COS(RADIANS(ST_Y(coordinates))) 
@@ -91,7 +93,7 @@ class homeController {
     }
 
     let agentsParsed = {};
-    let rowTemplate = `<tr><td>{0}</td><td>{1}</td></tr>`;
+    let rowTemplate = `<tr><td>{0}</td><td>{2}</td><td>{3}</td></tr>`;
 
     resultsAgents.forEach((singleTupleAgent) => {
       let index = singleTupleAgent.latitude + "," + singleTupleAgent.longitude;
@@ -104,10 +106,14 @@ class homeController {
       let rowToBeConcatenated = rowTemplate
         .replace(
           "{0}",
-          `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`
+          `<a href="tel:${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`
         )
         .replace(
-          "{1}",
+          "{2}",
+          `<a href="tel:${singleTupleAgent.phone}" target="_blank">${singleTupleAgent.phone}</a>`
+        )
+        .replace(
+          "{3}",
           `<a href="https://www.google.com/maps/dir/${coordinates.latitude},${coordinates.longitude}/${singleTupleAgent.latitude},${singleTupleAgent.longitude}" target="_blank">${singleTupleAgent.address}</a>`
         );
 
@@ -122,7 +128,7 @@ class homeController {
 
     res.json({
       data: agentsParsed,
-      template: `<table class="table table-hover"><tr><th>Agent Name</th><th>Directions(Google)</th></tr>{0}</table>`,
+      template: `<table class="table table-hover"><tr><th>Agents</th><th>Phone #</th><th>Directions(Google)</th></tr>{0}</table>`,
     });
   }
 }
