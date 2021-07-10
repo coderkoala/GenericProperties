@@ -46,10 +46,16 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
+    },
+    {
+      engine: 'InnoDB',
+      charset: 'utf8',
+      comment: 'Table for managing Agent Record Keeping',
+      collate: 'utf8_general_ci'
     });
-    await queryInterface.addIndex("Coordinates", ["coordinates"]);
-    await queryInterface.addIndex("AgentAddress", ["address"]);
-    await queryInterface.addIndex("AgentName", ["name"]);
+    await queryInterface.addIndex("Geolocation", ["coordinates"]);
+    await queryInterface.addIndex("Geolocation", ["address"]);
+    await queryInterface.addIndex("Geolocation", ["name"]);
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("Geolocation");
