@@ -87,7 +87,7 @@ class AgentViewHelper {
                 <th>Agent Name</th>
                 <th>Company Name</th>
                 <th>Phone Number</th>
-                <th><button id="sendEmailAgents" class="btn btn-outline-dark">Send Bulk mail</button></th>
+                <th><button id="sendEmailAgents" class="btn btn-outline-dark">SendAll</button></th>
               </tr>
             </thead>`
       .replace(/\s{2,}/g, "")
