@@ -5,6 +5,8 @@
     emailAgentsAPIEndpoint: "/api/v1/email",
     currentPageRouteEndpoint: "/geolocation",
     defaultDistanceToRenderNearbyAgents: 5,
+    emailBodyContent:
+      '<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">I work for Joe Oppen, an agent in United Real Estate located in New Jersey. I have a possible referral in your area.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Would you be interested?</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Thank you. </p>',
     fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
     fetchRemoteAgentsCollectionsCachedAPIEndpoint: "/api/v1/agents?id={leadid}",
@@ -27,6 +29,9 @@
 
       // Boot up the modals.
       glMSV.initCurrentModalsInDOM();
+
+      // Boot up the email editor.
+      glMSV.initWYSIWYGEditor();
 
       // Lastly, fetch Lead UUID if residing within dynamics as an iframe.
       glMSV.fetchDynamicsLeadUUIDfromParentIFrame();
@@ -52,12 +57,33 @@
       $("#saveSubject").click(function () {
         if (!$("#subject").hasClass("is-invalid")) {
           glMSV.subject = $("#subject").val();
-          $("#changeSubject").modal("hide");
+
+          if (
+            glMSV.emailBodyContent.match(
+              /(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i
+            )
+          ) {
+            glMSV.renderMessageBoxSWAL(
+              "Email Empty",
+              "The content of your email is empty. Please fill in valid email content to proceed.",
+              "error"
+            );
+            return;
+          } else {
+            glMSV.emailContentsUpsert = glMSV.emailBodyContent;
+            $("#changeSubject").modal("hide");
+          }
+        } else {
+          glMSV.renderMessageBoxSWAL(
+            "Invalid Email Subject",
+            "An email subject must be a well-formed sentence.",
+            "error"
+          );
         }
       });
 
       // Make the agents list table draggable.
-      $(".modal-dialog").draggable({
+      $(".draggable-ui").draggable({
         handle: ".modal-content",
         containment: "window",
       });
@@ -66,6 +92,18 @@
       $(".dismissModal").on("click", function (e) {
         glMSV.closeCurrentlyOpenedModal(this);
       });
+    },
+    initWYSIWYGEditor: function (e) {
+      const editor = pell.init({
+        element: document.getElementById("editor"),
+        onChange: (html) => {
+          window.glMSV.emailBodyContent = html;
+        },
+        defaultParagraphSeparator: "p",
+        styleWithCSS: true,
+        actions: ["bold", "italic", "heading1", "olist", "ulist"],
+      });
+      editor.content.innerHTML = window.glMSV.emailBodyContent;
     },
     closeCurrentlyOpenedModal(e) {
       $(e).parents().find(".modal").modal("hide");
@@ -102,7 +140,8 @@
           glMSV.hideLoadingScreenComponent();
           glMSV.renderPopOverSWALHTML(
             data.title || "Error",
-            data.message || "The agent record couldn't be found in your Dynamics 365 Database.",
+            data.message ||
+              "The agent record couldn't be found in your Dynamics 365 Database.",
             data.icon || "error"
           );
         },
@@ -553,6 +592,7 @@
         url: glMSV.emailAgentsAPIEndpoint,
         data: JSON.stringify({
           to: emailDataArray,
+          content: glMSV.emailContentsUpsert,
           names: emailRecipients,
           subject: glMSV.subject,
         }),
@@ -639,6 +679,7 @@
   $(document).ready(function () {
     switch (document.location.pathname) {
       case "/geolocation":
+        window.glMSV.emailContentsUpsert = glMSV.emailBodyContent;
         setTimeout(window.glMSV.initDOM, 500);
         break;
 
