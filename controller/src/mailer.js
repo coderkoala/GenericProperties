@@ -18,7 +18,7 @@ class Mailer {
   async getTransporter(userSwitch = "default") {
     let user = process.env.email_username_default;
     let pass = process.env.email_password_default;
-    let name = 'MSVProperties, LLC';
+    let name = 'MSVProperties';
 
     switch (userSwitch) {
       case "sara":
@@ -110,7 +110,7 @@ class Mailer {
       let mailTransporter = await this.getTransporter(req.sender || "default");
       req.to.forEach((singleEmail, arrayIndex) => {
         const params = this.prepareMail(
-          `${this.nameSender} <${this.mailSender}>` || `MSVProperties, LLC <${process.env.email_username_default}>`,
+          `${this.nameSender} <${this.mailSender}>` || `MSVProperties <${process.env.email_username_default}>`,
           singleEmail,
           req.subject,
           req.content ||
