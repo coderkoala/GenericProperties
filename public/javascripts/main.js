@@ -6,7 +6,15 @@
     currentPageRouteEndpoint: "/geolocation",
     defaultDistanceToRenderNearbyAgents: 5,
     emailBodyContent:
-      '<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">I work for Joe Oppen, an agent in United Real Estate located in New Jersey. I have a possible referral in your area.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Would you be interested?</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Thank you. </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Tamara</p>',
+      '<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">I work for Joe Oppen, an agent in United Real Estate located in New Jersey. I have a possible referral in your area.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Would you be interested?</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"> </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Thank you. </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">MSVProperties Representative</p>',
+    emailingUsersList: {
+      default1: "Refer to Broker & Buyer Agents",
+      default2: "MSV Group",
+      admin: "MSVProperties Admin",
+      carlota: "Carlota Panao",
+      sara: "Sara Assaf",
+      tamara: "Tamara Karic",
+    },
     fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
     fetchRemoteAgentsCollectionsCachedAPIEndpoint: "/api/v1/agents?id={leadid}",
@@ -58,9 +66,7 @@
         if (!$("#subject").hasClass("is-invalid")) {
           glMSV.subject = $("#subject").val();
 
-          if (
-            glMSV.emailBodyContent.match(/^.+\s.+$/)
-          ) {
+          if (!glMSV.emailBodyContent.match(/^.+\s.+$/)) {
             glMSV.renderMessageBoxSWAL(
               "Email Empty",
               "The content of your email is empty. Please fill in valid email content to proceed.",
@@ -90,6 +96,15 @@
       $(".dismissModal").on("click", function (e) {
         glMSV.closeCurrentlyOpenedModal(this);
       });
+
+      // Append Sender's List.
+      Object.keys(glMSV.emailingUsersList).forEach(function (tuple) {
+        var user = glMSV.emailingUsersList[tuple];
+        var option = tuple;
+        $("#sender").append(
+          '<option value="' + option + '">' + user + "</option>"
+        );
+      });
     },
     initWYSIWYGEditor: function (e) {
       const editor = pell.init({
@@ -99,7 +114,18 @@
         },
         defaultParagraphSeparator: "p",
         styleWithCSS: true,
-        actions: ["bold", "italic", "heading1", "paragraph", "strikethrough", "olist", "ulist", "link", "line", "underline" ],
+        actions: [
+          "bold",
+          "italic",
+          "heading1",
+          "paragraph",
+          "strikethrough",
+          "olist",
+          "ulist",
+          "link",
+          "line",
+          "underline",
+        ],
       });
       editor.content.innerHTML = window.glMSV.emailBodyContent;
     },
@@ -583,6 +609,7 @@
       }
     },
     sendEmail: (emailDataArray, emailRecipients = []) => {
+      var sender = $("#sender").val() || "default";
       glMSV.showLoadingScreenComponent();
       $.ajax({
         type: "POST",
@@ -592,6 +619,7 @@
           to: emailDataArray,
           content: glMSV.emailContentsUpsert,
           names: emailRecipients,
+          sender: sender,
           subject: glMSV.subject,
         }),
         success: function (data) {
