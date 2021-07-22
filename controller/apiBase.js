@@ -106,7 +106,7 @@ class homeController {
       let rowToBeConcatenated = rowTemplate
         .replace(
           "{0}",
-          `<a href="tel:${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`
+          `<a href="${singleTupleAgent.url}" target="_blank">${singleTupleAgent.name}</a>`
         )
         .replace(
           "{2}",

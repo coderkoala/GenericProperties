@@ -73,9 +73,36 @@
         $("#changeSubject").modal("show");
       });
 
-      $("#testEmail").click(function () {
-        $("#changeSubject").modal("show");
-      });
+      // Trigger send dummy email modal.
+      $("#testEmail")
+        .off()
+        .on("click", function (e) {
+          $("#testEmailModal").modal("show");
+        });
+
+      $("#sendTestEmail")
+        .off()
+        .on("click", function (e) {
+          $("#testEmailAddress").change();
+          $("#testEmailName").change();
+
+          if (
+            $("#testEmailAddress").hasClass("is-invalid") ||
+            $("#testEmailName").hasClass("is-invalid")
+          ) {
+            glMSV.renderMessageBoxSWAL(
+              "Email Parameters Invalid",
+              "The email address or the name supplied was found to be invalid, please try again with valid information",
+              "error"
+            );
+          } else {
+            $("#testEmailModal").modal("hide");
+            glMSV.sendEmail(
+              [$("#testEmailAddress").val() || null],
+              [$("#testEmailName").val() || "Test Email Sender"]
+            );
+          }
+        });
 
       // Save to email subject.
       $("#saveSubject").click(function () {

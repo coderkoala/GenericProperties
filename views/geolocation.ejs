@@ -27,10 +27,10 @@
             </button>
             <button
               id="testEmail"
-              class="input-group-text post-flight btn btn-outline-info hidden"
+              class="input-group-text post-flight btn btn btn-warning hidden"
               data-toggle="modal" data-target="#testEmailModal"
             >
-              Email Preview
+              Custom Email
             </button>
             <button
               id="triggerModalAgents"
@@ -156,35 +156,37 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Preview Email</h5>
+        <h5 class="modal-title">Custom Email Dispatch</h5>
       </div>
       <div class="modal-body">
-        <p>This feature lets you quickly preview the email being sent out before committing a mass email dispatch. Please be sure to enter correct information.</p>
-
+        <p style="font-weight: bold;">This feature lets you quickly dispatch an email to a specific email address that is not present in the List View for nearby Agents.</p>
+        <hr>
         <div class="mb-3">
-          <label for="testEmailName" class="form-label">Email address of receipent</label><br />
+          <label for="subject" class="form-label">Name of receipent</label><br />
+          <input
+            id="testEmailName"
+            validation="subject"
+            type="text"
+            class="form-control sanitize"
+            placeholder="John Doe"
+            aria-label="Name of the receiver(automatically pre-filled in case of mass-dispatch)"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="testEmailName" class="form-label">Email Address of receipent</label><br />
           <input
             id="testEmailAddress"
             validation="email"
             type="text"
             class="form-control"
-            aria-label="Email address to sent preview email to."
-          />
-        </div>
-        <div class="mb-3">
-          <label for="subject" class="form-label">Name to address with</label><br />
-          <input
-            id="testEmailName"
-            validation="subject"
-            type="text"
-            class="form-control"
-            aria-label="Name of the receiver(automatically pre-filled in case of mass-dispatch)"
+            placeholder="myemail@msvproperties.net"
+            aria-label="Email address to send the Custom Email Dispatch."
           />
         </div>
       </div>
       <div class="modal-footer">
-        <button id="sendTestEmail" type="button" class="btn btn-primary">Send Preview email</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="sendTestEmail" type="button" class="btn btn-primary">Dispatch Email</button>
+        <button type="button" class="btn btn-secondary dismissModal" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

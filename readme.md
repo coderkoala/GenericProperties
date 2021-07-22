@@ -1,4 +1,4 @@
-# GenRe Microservices v2.02
+# GenRe Microservices v2.03
 
 A nodeJS(ExpressJS) microservice server that helps geolocate nearby agents, and send bulk email requests to them. Written and maintained by [@coderkoala](https://github.com/coderkoala)
 
