@@ -6,8 +6,8 @@ class EmailTemplateViewer {
     this.params = params;
   }
 
-  getEmailBasic() {     
-return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  getEmailBasic() {
+    return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
 <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
@@ -30,6 +30,17 @@ return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://
     body {
       margin: 0;
       padding: 0;
+    }
+
+    p {
+      margin: 0; 
+      font-size: 14px; 
+      line-height: 1.8; 
+      word-break: break-word; 
+      text-align: justify; 
+      mso-line-height-alt: 25px; 
+      margin-top: 0; 
+      margin-bottom: 0;
     }
 
     table,
@@ -168,9 +179,9 @@ return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
+<div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;padding-bottom: 25px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:40px"> </div><img align="center" alt="United Real State LLC" border="0" class="center fixedwidth" src="https://media.bullseyeplus.com/OfficeWebsitesGallery//CustomPictures/UnitedRElogo.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 240px; display: block;" title="United Real State LLC" width="240"/>
+<div style="font-size:1px;line-height:40px"> </div><img align="center" alt="United Real State LLC" border="0" class="center fixedwidth" src="https://media.bullseyeplus.com/OfficeWebsitesGallery/CustomPictures/UnitedRElogo.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 240px; display: block;" title="United Real State LLC" width="240"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if (!mso)&(!IE)]><!-->
@@ -210,8 +221,8 @@ return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://
 </table>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 20px; padding-bottom: 15px; font-family: 'Trebuchet MS', Tahoma, sans-serif"><![endif]-->
 <div style="color:#000000;font-family:'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;line-height:1.8;padding-top:20px;padding-right:25px;padding-bottom:15px;padding-left:25px;">
-<div class="txtTinyMce-wrapper" style="line-height: 1.8; font-size: 12px; font-family: 'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; color: #000000; mso-line-height-alt: 22px;">
-<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Hello{name}, </p>
+<div class="txtTinyMce-wrapper" style="line-height: 1.8; font-size: 12px; font-family: 'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; color: #000000; mso-line-height-alt: 25px;">
+<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Hello{name},</p>
 {content}
 </div>
 </div>
@@ -255,9 +266,8 @@ return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://
 <div style="color:#ffffff;font-family:'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;line-height:1.8;padding-top:25px;padding-right:10px;padding-bottom:50px;padding-left:10px;">
 <div class="txtTinyMce-wrapper" style="line-height: 1.8; font-size: 12px; font-family: 'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; color: #ffffff; mso-line-height-alt: 22px;">
 <p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;">UNITED REAL STATE CENTRAL JERSEY</span></p>
-<p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;"><a href="tel:(609) 308-6539" rel="noopener" style="color: #9e814f;" target="_blank" title="tel:(609) 308-6539">Call us: (609) 308-6539</a></span></p>
-<p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;">614 Rte. 130, EAST,</span></p>
-<p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;">WINDSOR, NJ, 08520</span></p>
+<p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;">211 Boulevard of Americas Street 102,</span></p>
+<p style="margin: 0; font-size: 12px; line-height: 1.8; word-break: break-word; text-align: center; mso-line-height-alt: 22px; margin-top: 0; margin-bottom: 0;"><span style="font-size: 12px; color: #ffffff;">Lakewood NJ 08701</span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
