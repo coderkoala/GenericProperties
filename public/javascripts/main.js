@@ -40,7 +40,7 @@
       $("input").on("input change keyup", function (e) {
         glMSV.validateInputBoxValue(this);
       });
-      $("input").on("blur", function (e) {
+      $("input.sanitize").on("blur", function (e) {
         glMSV.sanitizeInputBoxValue(this);
       });
       $("#btnSubmit").on("click", function (e) {
@@ -73,6 +73,10 @@
         $("#changeSubject").modal("show");
       });
 
+      $("#testEmail").click(function () {
+        $("#changeSubject").modal("show");
+      });
+
       // Save to email subject.
       $("#saveSubject").click(function () {
         if (!$("#subject").hasClass("is-invalid")) {
@@ -82,6 +86,14 @@
             glMSV.renderMessageBoxSWAL(
               "Email Empty",
               "The content of your email is empty. Please fill in valid email content to proceed.",
+              "error"
+            );
+            return;
+          } else if (glMSV.emailBodyContent.match(/\_/g)) {
+            // Preventing a template spilling to consumers.
+            glMSV.renderMessageBoxSWAL(
+              "Details not filled",
+              "The content of your email still has template remnants. Please replace any underscores with personal details.",
               "error"
             );
             return;
@@ -411,7 +423,7 @@
           .replace("?id=", "")
           .split("&")[0];
         $("#location").val(leadUUIDfromParentIFrame).change();
-        if( '' !== leadUUIDfromParentIFrame ) {
+        if ("" !== leadUUIDfromParentIFrame) {
           flagSkipHidingUIComponents = true;
         }
       } catch (e) {}
@@ -522,7 +534,7 @@
       glMSV.showLoadingScreenComponent();
       $("#tableau").fadeOut("slow");
       $("input").change();
-      if ($(".is-invalid").length) {
+      if ($("#location").hasClass("is-invalid")) {
         glMSV.renderMessageBoxSWAL(
           "Error",
           "Invalid Lead UUID detected, computation can not occur without valid Lead UUID.",
@@ -628,6 +640,11 @@
               .val()
               .match(/(^\s+$|^$)|((@|\||\*|\^|\_|%|!|~|\+)+)/i)
           ) {
+            $selectedElement.addClass("is-invalid");
+          }
+          break;
+        case "email":
+          if (!$selectedElement.val().match(/^(.+)@(.+)$/gi)) {
             $selectedElement.addClass("is-invalid");
           }
           break;

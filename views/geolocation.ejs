@@ -11,7 +11,7 @@
               validation="location"
               id="location"
               type="text"
-              class="form-control"
+              class="form-control sanitize"
               placeholder="Lead UUID"
               aria-label="Lead UUID"
               aria-describedby="basic-addon2"
@@ -24,6 +24,13 @@
               class="input-group-text post-flight btn btn-outline-info hidden"
             >
               Compose Email
+            </button>
+            <button
+              id="testEmail"
+              class="input-group-text post-flight btn btn-outline-info hidden"
+              data-toggle="modal" data-target="#testEmailModal"
+            >
+              Email Preview
             </button>
             <button
               id="triggerModalAgents"
@@ -112,7 +119,7 @@
             id="subject"
             validation="subject"
             type="text"
-            class="form-control"
+            class="form-control sanitize"
             aria-label="Subject for email"
           />
         </div>
@@ -140,6 +147,44 @@
         <button id="saveSubject" type="button" class="btn btn-primary">
           Save changes
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="testEmailModal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Preview Email</h5>
+      </div>
+      <div class="modal-body">
+        <p>This feature lets you quickly preview the email being sent out before committing a mass email dispatch. Please be sure to enter correct information.</p>
+
+        <div class="mb-3">
+          <label for="testEmailName" class="form-label">Email address of receipent</label><br />
+          <input
+            id="testEmailAddress"
+            validation="email"
+            type="text"
+            class="form-control"
+            aria-label="Email address to sent preview email to."
+          />
+        </div>
+        <div class="mb-3">
+          <label for="subject" class="form-label">Name to address with</label><br />
+          <input
+            id="testEmailName"
+            validation="subject"
+            type="text"
+            class="form-control"
+            aria-label="Name of the receiver(automatically pre-filled in case of mass-dispatch)"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="sendTestEmail" type="button" class="btn btn-primary">Send Preview email</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
