@@ -15,6 +15,18 @@
       sara: "Sara Assaf",
       tamara: "Tamara Karic",
     },
+    emailTemplates: {
+      0: {
+        name: "R2B Email Template",
+        content:
+          '<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">My name is _____, I work for an agent out of New Jersey that is licensed with United real Estate. We help match home-owners with the top agents in their area. We have a potential listing referral that you might be keenly interested in.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">&nbsp;</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Please let me know if you are interested on working together to build a successful network.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">&nbsp;</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Thank you! </p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">_____</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Phone (call or text): (xxx) xxx-xxxx <br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Email: _______@msvproperties.net<br></p>',
+      },
+      1: {
+        name: "Buyer Agent Email Template",
+        content:
+          '<p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Good Afternoon, my name is _____, I work for a private investor in New Jersey. We are searching someone to represent us in the purchase of a property in your area, it looks like we could get it for a good deal. <br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"><br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">We work primarily with foreclosures and probates, and this is one of them. We already tried reaching out to the owner, but we were not successful - but if you are local and you are able to knock on their door, you could probably help us get this deal. <br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"><br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">The price we offered on the contract is $__________, I am willing to pay a 2% commission of the purchase price to a buyer\'s agent if you can help facilitate this purchase (this is not a listing).</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"><br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">I am looking forward to working together, please let me know if you are interested, and you can just reply to this email to confirm so we can proceed. Alternatively, we can sign a Buyer\'s Agent Agreement.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;"><br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">I have provided my contact information below, thank you for your time and consideration.</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">&nbsp;_____</p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Phone (call or text): (xxx) xxx-xxxx <br></p><p style="margin: 0; font-size: 14px; line-height: 1.8; word-break: break-word; text-align: justify; mso-line-height-alt: 25px; margin-top: 0; margin-bottom: 0;">Email: _______@msvproperties.net<br></p>',
+      },
+    },
     fetchRemoteAgentsAPIEndpoint:
       "/api/v1/geolocation?latitude={latitude}&longitude={longitude}&distance={distance}&leadid={leadid}",
     fetchRemoteAgentsCollectionsCachedAPIEndpoint: "/api/v1/agents?id={leadid}",
@@ -105,6 +117,16 @@
           '<option value="' + option + '">' + user + "</option>"
         );
       });
+
+      // Populate templates.
+      Object.keys(glMSV.emailTemplates).forEach(function(tuple){
+        var templateElement = glMSV.emailTemplates[tuple];
+        var templateName = templateElement.name;
+
+        $("#template").append(
+          '<option value="' + tuple + '">' + templateName + "</option>"
+        );
+      })
     },
     initWYSIWYGEditor: function (e) {
       const editor = pell.init({
