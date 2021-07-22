@@ -119,14 +119,23 @@
       });
 
       // Populate templates.
-      Object.keys(glMSV.emailTemplates).forEach(function(tuple){
+      Object.keys(glMSV.emailTemplates).forEach(function (tuple) {
         var templateElement = glMSV.emailTemplates[tuple];
         var templateName = templateElement.name;
 
         $("#template").append(
           '<option value="' + tuple + '">' + templateName + "</option>"
         );
-      })
+      });
+
+      $("#template").change(function (e) {
+        var $this = $(e.currentTarget).val();
+
+        try {
+          var emailContent = glMSV.emailTemplates[$this].content;
+          $(".pell-content").html(emailContent);
+        } catch (e) {}
+      });
     },
     initWYSIWYGEditor: function (e) {
       const editor = pell.init({
@@ -396,19 +405,20 @@
       });
     },
     fetchDynamicsLeadUUIDfromParentIFrame: function () {
-      var flagSkipHidingUIComponents = true;
+      var flagSkipHidingUIComponents = false;
       try {
         var leadUUIDfromParentIFrame = window.location.search
           .replace("?id=", "")
           .split("&")[0];
         $("#location").val(leadUUIDfromParentIFrame).change();
-      } catch (e) {
-        flagSkipHidingUIComponents = true;
-      }
+        if( '' !== leadUUIDfromParentIFrame ) {
+          flagSkipHidingUIComponents = true;
+        }
+      } catch (e) {}
 
-      if (!flagSkipHidingUIComponents) {
-        $("nav").hide(); // For reducing noise.
-        $("footer").hide(); // For reducing noise.
+      if (flagSkipHidingUIComponents) {
+        $(".navbar").hide(); // For reducing noise.
+        $(".footer").hide(); // For reducing noise.
       }
     },
     fetchNearbyAgentsDatafromBackend: function () {
