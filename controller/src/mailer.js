@@ -40,6 +40,21 @@ class Mailer {
         user = process.env.email_username_admin;
         pass = process.env.email_password_admin;
         break;
+      case "christian":
+        name = 'Christian Soto';
+        user = process.env.email_username_christian;
+        pass = process.env.email_password_christian;
+        break;
+      case "amir":
+        name = 'Amir Karimi';
+        user = process.env.email_username_amir;
+        pass = process.env.email_password_amir;
+        break;
+      case "gladys":
+        name = 'Gladys Nnaji';
+        user = process.env.email_username_gladys;
+        pass = process.env.email_password_gladys;
+        break;
       case "default1":
         user = user;
         pass = pass;

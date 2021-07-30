@@ -14,6 +14,9 @@
       carlota: "Carlota Panao",
       sara: "Sara Assaf",
       tamara: "Tamara Karic",
+      christian: "Christian Soto",
+      amir: "Amir Karimi",
+      gladys: "Gladys Nnaji",
     },
     emailTemplates: {
       0: {
