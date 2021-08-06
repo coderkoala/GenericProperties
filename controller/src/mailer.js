@@ -75,6 +75,9 @@ class Mailer {
     return nodemailer.createTransport({
       port: process.env.email_port || 587,
       host: process.env.email_host || "smtp.office365.com",
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 300,
       auth: {
         user: user,
         pass: pass,
@@ -119,12 +122,12 @@ class Mailer {
     req.names =
       req.names === undefined ? [] : req.names.length ? req.names : [];
 
-    if ("error" === error) {
-      return res.status(400).json(response);
-    } else {
-      let mailTransporter = await this.getTransporter(req.sender || "default");
-      req.to.forEach((singleEmail, arrayIndex) => {
-        const params = this.prepareMail(
+      if ("error" === error) {
+        return res.status(400).json(response);
+      } else {
+        let mailTransporter = await this.getTransporter(req.sender || "default");
+        req.to.forEach((singleEmail, arrayIndex) => {
+          const params = this.prepareMail(
           `${this.nameSender} <${this.mailSender}>` || `MSVProperties <${process.env.email_username_default}>`,
           singleEmail,
           req.subject,
